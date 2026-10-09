@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root, .theme-oled {
+    --bg-primary: #030712;
+    --card-bg: #0b0f19;
+    --card-border: #1e293b;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --input-bg: #030712;
+  }
+
+  .theme-slate {
+    --bg-primary: #0f172a;
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    --text-primary: #f8fafc;
+    --text-muted: #cbd5e1;
+    --input-bg: #0f172a;
+  }
+
+  .theme-light {
+    --bg-primary: #f8fafc;
+    --card-bg: #ffffff;
+    --card-border: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-muted: #475569;
+    --input-bg: #ffffff;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* Comprehensive Theme-Light Overrides for Minimal Light Mode */
+html.theme-light, body.theme-light, .theme-light {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+.theme-light header {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+/* Backgrounds */
+.theme-light .bg-slate-950,
+.theme-light .bg-slate-900, 
+.theme-light .bg-slate-900\/90, 
+.theme-light .bg-slate-900\/80, 
+.theme-light .bg-slate-900\/60,
+.theme-light .bg-slate-900\/50,
+.theme-light .bg-slate-800,
+.theme-light .bg-slate-800\/50 {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+/* Borders */
+.theme-light .border-slate-800,
+.theme-light .border-slate-700,
+.theme-light .border-slate-800\/60,
+.theme-light .border-slate-800\/80 {
+  border-color: #e2e8f0 !important;
+}
+
+/* Text Colors */
+.theme-light .text-white,
+.theme-light .text-slate-100,
+.theme-light .text-slate-200,
+.theme-light .text-slate-300 {
+  color: #0f172a !important;
+}
+
+.theme-light .text-slate-400,
+.theme-light .text-slate-500 {
+  color: #475569 !important;
+}
+
+/* Inputs */
+.theme-light select,
+.theme-light input[type="text"],
+.theme-light input[type="email"],
+.theme-light input[type="password"],
+.theme-light input[type="number"] {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border-color: #cbd5e1 !important;
+}
+.theme-light input:focus {
+  border-color: #0ea5e9 !important;
+  background-color: #ffffff !important;
+}
+
+/* Specific colored backgrounds & borders for light mode */
+.theme-light .bg-teal-500\/10, .theme-light .bg-teal-500\/20, .theme-light .bg-teal-950\/30 {
+  background-color: #f0fdfa !important;
+}
+.theme-light .border-teal-500\/40, .theme-light .border-teal-500\/30 {
+  border-color: #5eead4 !important;
+}
+.theme-light .bg-rose-500\/10, .theme-light .bg-rose-950\/30 {
+  background-color: #fff1f2 !important;
+}
+.theme-light .border-rose-500\/40, .theme-light .border-rose-500\/30 {
+  border-color: #fecdd3 !important;
+}
+.theme-light .bg-amber-500\/10 {
+  background-color: #fffbeb !important;
+}
+.theme-light .border-amber-500\/30 {
+  border-color: #fde68a !important;
+}
+.theme-light .bg-blue-500\/10, .theme-light .bg-sky-500\/10 {
+  background-color: #f0f9ff !important;
+}
+.theme-light .bg-purple-500\/10, .theme-light .bg-purple-950\/40 {
+  background-color: #faf5ff !important;
+}
+.theme-light .bg-emerald-500\/10, .theme-light .bg-emerald-950\/20, .theme-light .bg-emerald-950\/40 {
+  background-color: #ecfdf5 !important;
+}
+
+/* Fix chart text and lines in light mode (if any SVGs inherit) */
+.theme-light text {
+  fill: #475569 !important;
+}
+
+/* Glowing Animations */
+@keyframes pulseGlowEmerald {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(46, 91, 79, 0.2);
+    border-color: rgba(46, 91, 79, 0.6);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(59, 110, 96, 0.4);
+    border-color: rgba(59, 110, 96, 0.8);
+  }
+}
+
+@keyframes pulseGlowCrimson {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(225, 29, 72, 0.3);
+    border-color: rgba(225, 29, 72, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(225, 29, 72, 0.5);
+    border-color: rgba(244, 63, 94, 1);
+  }
+}
+
+.glow-emerald {
+  animation: pulseGlowEmerald 2.5s infinite ease-in-out;
+}
+
+.glow-crimson {
+  animation: pulseGlowCrimson 1.2s infinite ease-in-out;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
