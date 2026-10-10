@@ -171,11 +171,10 @@ export const UserPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Senior-Friendly Clean Navigation Tabs (No redundant settings tab) */}
-      <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-slate-900 border border-slate-800 rounded-2xl">
+      {/* Senior-Friendly Clean Navigation Tabs (Auto-spaced, No horizontal scroll, Hover-toggle) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 p-2 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
         {[
           { id: 'switchboard', label: 'Main Switches', icon: Zap },
-          { id: 'telemetry', label: 'Power & Health', icon: Activity },
           { id: 'billing', label: 'Monthly Bill', icon: DollarSign },
           { id: 'electrician', label: 'Book Electrician', icon: UserCheck },
           { id: 'report_bug', label: 'Report Issue', icon: AlertOctagon },
@@ -188,14 +187,15 @@ export const UserPortal: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setUserActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-3 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              onMouseEnter={() => setUserActiveTab(tab.id as any)}
+              className={`flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
                 isActive
-                  ? 'bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 shadow-md shadow-teal-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 shadow-lg shadow-teal-500/25 scale-[1.02]'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/80 hover:scale-[1.01]'
               }`}
             >
-              <Icon className={`w-4 h-4 ${isActive ? 'text-slate-950' : 'text-teal-400'}`} />
-              <span>{tab.label}</span>
+              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-slate-950' : 'text-teal-400'}`} />
+              <span className="truncate">{tab.label}</span>
             </button>
           );
         })}
@@ -212,29 +212,6 @@ export const UserPortal: React.FC = () => {
             <span className="text-xs text-slate-400">Click breaker switches to turn on/off or test safe cutoff</span>
           </div>
           <SwitchboardTab />
-        </div>
-      )}
-
-      {/* TAB CONTENT: Power & Health (Telemetry) */}
-      {userActiveTab === 'telemetry' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center space-x-2">
-                <Activity className="w-5 h-5 text-teal-400" />
-                <span>Live Power Telemetry & Voltage Chart</span>
-              </h3>
-              <p className="text-xs text-slate-400">Live 1-second sensor updates for Kothrud, Paud Road feeder</p>
-            </div>
-            <button
-              onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
-              className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-md flex items-center space-x-1.5 transition"
-            >
-              <Download className="w-4 h-4" />
-              <span>Export Telemetry PDF</span>
-            </button>
-          </div>
-          <TelemetryTab />
         </div>
       )}
 
