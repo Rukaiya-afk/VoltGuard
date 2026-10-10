@@ -39,14 +39,14 @@ export default function SensitivitySettingsPage() {
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 space-y-6 shadow-xl backdrop-blur-md">
           <div className="text-xs font-semibold text-slate-300">
-            Adjust the Isolation Forest Machine Learning algorithm anomaly threshold score. Outliers surpassing this cutoff trigger emergency breaker trips and siren alerts.
+            Set how sensitive the fire safety system should be. If sparks, wire overheating, or high voltage spikes are detected, the system will automatically alert you and protect your appliances.
           </div>
 
           <div className="rounded-2xl border border-slate-800 bg-slate-950 p-6 space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">Anomaly Trigger Cutoff Score</div>
-                <div className="text-xs text-slate-400">Current trigger threshold</div>
+                <div className="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">Hazard Sensitivity Level</div>
+                <div className="text-xs text-slate-400">Higher values detect smaller electrical irregularities</div>
               </div>
               <div className="rounded-2xl bg-amber-500/10 border border-amber-500/30 px-5 py-2 text-2xl font-extrabold text-amber-400 font-mono">
                 {settings.anomalySensitivity.toFixed(2)}
@@ -66,17 +66,17 @@ export default function SensitivitySettingsPage() {
             <div className="grid grid-cols-3 gap-4 text-[11px] font-mono border-t border-slate-800 pt-4">
               <div className="space-y-1">
                 <div className="font-bold text-teal-400">0.50 - 0.65</div>
-                <div className="text-slate-400 text-[10px]">Ultra-High Sensitivity (Early warning for legacy wiring)</div>
+                <div className="text-slate-400 text-[10px]">High Protection (Recommended for older homes)</div>
               </div>
 
               <div className="space-y-1 text-center">
                 <div className="font-bold text-amber-400">0.70 - 0.80 (Default)</div>
-                <div className="text-slate-400 text-[10px]">Standard Balance (Recommended for modern homes)</div>
+                <div className="text-slate-400 text-[10px]">Standard Protection (Best for typical Kothrud residences)</div>
               </div>
 
               <div className="space-y-1 text-right">
                 <div className="font-bold text-rose-400">0.85 - 0.95</div>
-                <div className="text-slate-400 text-[10px]">Conservative Cutoff (Emergency fire risks only)</div>
+                <div className="text-slate-400 text-[10px]">Critical Alerts Only (Emergency hazard trips only)</div>
               </div>
             </div>
           </div>

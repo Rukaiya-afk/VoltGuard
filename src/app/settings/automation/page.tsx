@@ -18,32 +18,32 @@ export default function AutomationSettingsPage() {
   const togglesList: Array<{ key: ToggleKey; label: string; desc: string; icon: any }> = [
     { 
       key: 'autoCutoffEnabled', 
-      label: 'Auto-Cutoff Breakers on Thermal Hazard', 
-      desc: 'Automatically trips virtual breaker when plug temperature hits >65°C to eliminate electrical fire risks.',
+      label: 'Automatic Emergency Power Cutoff', 
+      desc: 'Instantly turns off the socket power when overheating (>65°C) or sparks are detected to prevent fires.',
       icon: Flame
     },
     { 
       key: 'inrushMaskingEnabled', 
-      label: 'Motor Inrush Surge Masking Algorithm', 
-      desc: 'Prevents false positive trips during compressor/motor startup surge spikes (<450ms duration).',
+      label: 'Appliance Start-Up Filter', 
+      desc: 'Prevents false alarms when large appliances (refrigerator, AC motor, mixer) turn on.',
       icon: Shield
     },
     { 
       key: 'sirenEnabled', 
-      label: 'Audible Emergency Siren Playback', 
-      desc: 'Synthesizes Web Audio alarm sounds during fire hazard cutoffs.',
+      label: 'Play Siren Sound on Hazard', 
+      desc: 'Plays an audible warning siren from your device speakers when high fire risk is detected.',
       icon: Bell
     },
     { 
       key: 'autoStreamEnabled', 
-      label: 'Background Telemetry Stream', 
-      desc: 'Continuously streams SSE telemetry frames every second across tabs.',
+      label: 'Live Home Monitoring', 
+      desc: 'Continuously monitors voltage, current, and socket temperatures in the background.',
       icon: Radio
     },
     { 
       key: 'emailAlertsEnabled', 
-      label: 'Email & Push Hazard Notifications', 
-      desc: 'Sends immediate alert notifications when anomaly score exceeds threshold.',
+      label: 'SMS & WhatsApp Emergency Alerts', 
+      desc: 'Sends immediate text alerts to your registered family phone number when hazards occur.',
       icon: Zap
     },
   ];
@@ -66,7 +66,7 @@ export default function AutomationSettingsPage() {
               <div className="text-[10px] font-extrabold uppercase tracking-wider text-purple-400 font-mono">Partition 09</div>
               <h1 className="text-2xl font-extrabold text-white flex items-center space-x-2">
                 <Zap className="h-6 w-6 text-purple-400" />
-                <span>Smart System Automation Toggles</span>
+                <span>Automatic Safety Switches</span>
               </h1>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function AutomationSettingsPage() {
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 space-y-5 shadow-xl backdrop-blur-md">
           <div className="text-xs font-semibold text-slate-300">
-            Configure automated safety responses, algorithmic noise masking, and background monitoring telemetry.
+            Customize automatic safety protections for your Kothrud residence.
           </div>
 
           <div className="space-y-4">

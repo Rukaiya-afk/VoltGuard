@@ -46,8 +46,8 @@ export default function SettingsHubPage() {
       num: '01',
       id: 'account',
       href: '/settings/account',
-      title: 'Account & Consumer Profile',
-      desc: 'Consumer ID, registered email, tariff rate plan, JSON data export, and test account switcher.',
+      title: 'Customer Profile & Address',
+      desc: 'Consumer ID, registered mobile/email, MSEDCL Kothrud tariff rate, and switch demo accounts.',
       icon: User,
       badge: userProfile.name,
       color: 'text-teal-400 border-teal-500/40 bg-teal-500/10'
@@ -56,8 +56,8 @@ export default function SettingsHubPage() {
       num: '02',
       id: 'theme',
       href: '/settings/theme',
-      title: 'Visual Screen Theme',
-      desc: 'OLED Dark (Pitch Black), Deep Slate, and Minimal Light neutral theme surface controls.',
+      title: 'Display Color & Theme',
+      desc: 'Switch between Pitch Black (OLED), Dark Slate, and Crisp Light for comfortable reading.',
       icon: Monitor,
       badge: settings.theme.toUpperCase(),
       color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10'
@@ -66,8 +66,8 @@ export default function SettingsHubPage() {
       num: '03',
       id: 'telemetry',
       href: '/settings/telemetry',
-      title: 'Telemetry Refresh Speed',
-      desc: 'Live SSE stream refresh frequency: Fast (500ms), Balanced (1000ms), Eco Saver (2000ms).',
+      title: 'Screen Update Speed',
+      desc: 'How quickly live power numbers refresh on your screen (Fast, Normal, or Battery Saver).',
       icon: Radio,
       badge: `${settings.refreshRate}ms`,
       color: 'text-sky-400 border-sky-500/40 bg-sky-500/10'
@@ -76,8 +76,8 @@ export default function SettingsHubPage() {
       num: '04',
       id: 'sensitivity',
       href: '/settings/sensitivity',
-      title: 'Sensor & Anomaly Sensitivity',
-      desc: 'Isolation Forest machine learning fire hazard cutoff score tuning (0.50 - 0.95).',
+      title: 'Hazard & Spark Sensitivity',
+      desc: 'Fine-tune how quickly VoltGuard detects loose sparks, heating wires, and appliance overloads.',
       icon: Sliders,
       badge: settings.anomalySensitivity.toFixed(2),
       color: 'text-amber-400 border-amber-500/40 bg-amber-500/10'
@@ -86,8 +86,8 @@ export default function SettingsHubPage() {
       num: '05',
       id: 'alerts',
       href: '/settings/alerts',
-      title: 'Alert Ringtones, Haptics & Vibration',
-      desc: 'Siren sound selector, volume, haptic vibration pattern engine, intensity slider, and audio FX.',
+      title: 'Alert Sounds & Vibration',
+      desc: 'Choose emergency alarm sounds, adjust speaker volume, and toggle phone vibration patterns.',
       icon: Bell,
       badge: settings.alarmTone.toUpperCase(),
       color: 'text-rose-400 border-rose-500/40 bg-rose-500/10'
@@ -96,18 +96,18 @@ export default function SettingsHubPage() {
       num: '06',
       id: 'audio-upload',
       href: '/settings/audio-upload',
-      title: 'Custom Audio Sound Upload',
-      desc: 'Upload custom .mp3 or .wav audio tracks to replace system emergency sirens.',
+      title: 'Custom Voice / Alarm Tone',
+      desc: 'Upload a custom sound or family voice message for emergency notifications.',
       icon: Upload,
-      badge: settings.customAudioDataUrl ? 'CUSTOM AUDIO SET' : 'DEFAULT',
+      badge: settings.customAudioDataUrl ? 'CUSTOM AUDIO' : 'DEFAULT',
       color: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
     },
     {
       num: '07',
       id: 'privacy',
       href: '/settings/privacy',
-      title: 'Privacy & Security Management',
-      desc: 'Two-Factor Authentication (2FA), anonymized telemetry streaming, and session auto-lock.',
+      title: 'Security & Login Protection',
+      desc: 'Two-Step Verification (OTP), data privacy protections, and auto screen lock timer.',
       icon: Shield,
       badge: settings.twoFactorEnabled ? '2FA ACTIVE' : '2FA DISABLED',
       color: 'text-blue-400 border-blue-500/40 bg-blue-500/10'
@@ -116,8 +116,8 @@ export default function SettingsHubPage() {
       num: '08',
       id: 'payment',
       href: '/settings/payment',
-      title: 'Payment Gateway & Saved Cards',
-      desc: 'Credit & Debit Card payment options only (No UPI), saved cards list, and Auto-Pay settings.',
+      title: 'Electricity Bill Payment & Cards',
+      desc: 'Manage saved debit/credit cards and set up automatic monthly electricity bill payments.',
       icon: CreditCard,
       badge: `${settings.savedCards.length} CARDS`,
       color: 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10'
@@ -126,10 +126,10 @@ export default function SettingsHubPage() {
       num: '09',
       id: 'automation',
       href: '/settings/automation',
-      title: 'Smart System Automation Toggles',
-      desc: 'Auto-cutoff breakers, motor inrush surge masking algorithm, siren playback, and push alerts.',
+      title: 'Automatic Safety Switches',
+      desc: 'Automatically trip power switches upon fire danger to keep your home and family safe.',
       icon: Zap,
-      badge: settings.autoCutoffEnabled ? 'CUTOFF ACTIVE' : 'MANUAL',
+      badge: settings.autoCutoffEnabled ? 'AUTO-CUTOFF ON' : 'MANUAL',
       color: 'text-purple-400 border-purple-500/40 bg-purple-500/10'
     }
   ];

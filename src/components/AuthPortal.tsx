@@ -276,15 +276,15 @@ export const AuthPortal: React.FC = () => {
             {selectedRole === 'user' && (
               <div className="space-y-1 text-slate-400 text-[11px]">
                 <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
-                  <span>👤 <strong>Rajesh Sharma</strong> (Senior Resident):</span>
+                  <span>👤 <strong>Rajesh Sharma</strong> (Kothrud Senior Resident):</span>
                   <span className="font-mono text-teal-300">rajesh.sharma@gmail.com / password123</span>
                 </div>
                 <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
-                  <span>👤 <strong>Priya Patel</strong> (Juhu Resident):</span>
+                  <span>👤 <strong>Priya Patel</strong> (Mayur Colony, Kothrud):</span>
                   <span className="font-mono text-teal-300">priya.patel@gmail.com / password123</span>
                 </div>
                 <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
-                  <span>👤 <strong>Amit Verma</strong> (Powai Resident):</span>
+                  <span>👤 <strong>Amit Verma</strong> (Karve Nagar, Pune):</span>
                   <span className="font-mono text-teal-300">amit.verma@gmail.com / password123</span>
                 </div>
               </div>
@@ -293,15 +293,15 @@ export const AuthPortal: React.FC = () => {
             {selectedRole === 'electrician' && (
               <div className="space-y-1 text-slate-400 text-[11px]">
                 <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
-                  <span>⚡ <strong>Vikram Jadhav</strong> (Bandra West - 4.9★):</span>
+                  <span>⚡ <strong>Vikram Jadhav</strong> (Kothrud / Paud Road - 4.9★):</span>
                   <span className="font-mono text-amber-300">vikram.electrician@gmail.com / electrician123</span>
                 </div>
                 <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
-                  <span>⚡ <strong>Suresh Nair</strong> (Juhu / Versova - 4.8★):</span>
+                  <span>⚡ <strong>Suresh Nair</strong> (Bavdhan / Kothrud - 4.8★):</span>
                   <span className="font-mono text-amber-300">suresh.electrician@gmail.com / electrician123</span>
                 </div>
                 <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
-                  <span>⚡ <strong>Arun Kumar</strong> (Powai / Ghatkopar - 4.9★):</span>
+                  <span>⚡ <strong>Arun Kumar</strong> (Erandwane / Deccan - 4.9★):</span>
                   <span className="font-mono text-amber-300">arun.electrician@gmail.com / electrician123</span>
                 </div>
               </div>
