@@ -13,11 +13,13 @@ import {
   Check, 
   AlertCircle,
   Building2,
-  ShieldCheck
+  ShieldCheck,
+  Wrench
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
-import { useVoltStore } from '@/lib/store';
+import { useVoltStore, SEEDED_CONSUMERS, SEEDED_ELECTRICIANS } from '@/lib/store';
+import { exportTelemetryReportPdf } from '@/lib/pdfGenerator';
 
 export default function AccountSettingsPage() {
   const router = useRouter();
@@ -25,10 +27,13 @@ export default function AccountSettingsPage() {
     settings,  
     userProfile, 
     updateUserProfile, 
-    loginNormalUser, 
-    loginSpikedUser, 
+    loginAsUser,
+    loginAsElectrician,
+    loginAsAdmin,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    currentUserRole,
+    outlets
   } = useVoltStore();
 
   React.useEffect(() => {
@@ -62,112 +67,92 @@ export default function AccountSettingsPage() {
     setIsEditingAccount(false);
   };
 
-  const handleExportData = () => {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ userProfile, settings }, null, 2));
-    const downloadAnchor = document.createElement('a');
-    downloadAnchor.setAttribute("href", dataStr);
-    downloadAnchor.setAttribute("download", `voltguard_account_${userProfile.consumerNumber}.json`);
-    document.body.appendChild(downloadAnchor);
-    downloadAnchor.click();
-    downloadAnchor.remove();
-  };
-
   return (
     <div className={`min-h-screen theme-${settings.theme} transition-colors duration-200`}>
       <Header />
 
-      <main className="mx-auto max-w-4xl px-4 py-8 space-y-6">
-        {/* Navigation Top Bar */}
-        <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-          <div className="flex items-center space-x-3">
-            <Link
-              href="/settings"
-              className="flex items-center space-x-1.5 rounded-xl border border-slate-800 bg-slate-900 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800 transition-colors shadow-sm"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Settings Hub</span>
-            </Link>
-            <div>
-              <div className="text-[10px] font-extrabold uppercase tracking-wider text-teal-400 font-mono">Partition 01</div>
-              <h1 className="text-2xl font-extrabold text-white flex items-center space-x-2">
-                <User className="h-6 w-6 text-teal-400" />
-                <span>Account & Consumer Profile</span>
-              </h1>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => setIsEditingAccount(!isEditingAccount)}
-            className="flex items-center space-x-1.5 rounded-xl border border-teal-500/40 bg-teal-500/10 px-4 py-2 text-xs font-bold text-teal-300 hover:bg-teal-500/20 transition-all"
-          >
-            <Edit3 className="h-4 w-4" />
-            <span>{isEditingAccount ? 'Cancel Editing' : 'Edit Account Info'}</span>
-          </button>
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8 space-y-6">
+        
+        {/* Navigation Breadcrumb */}
+        <div className="flex items-center space-x-2 text-xs text-slate-400">
+          <Link href="/" className="hover:text-teal-400 flex items-center space-x-1">
+            <ArrowLeft className="h-3.5 w-3.5" />
+            <span>Back to Dashboard</span>
+          </Link>
+          <span>/</span>
+          <span className="text-slate-200 font-semibold">Account & Roles</span>
         </div>
 
-        {/* Profile Details or Edit Form */}
-        <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 space-y-6 shadow-xl backdrop-blur-md">
+        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 sm:p-8 space-y-6 shadow-xl">
+          
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-800 gap-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-500/10 border border-teal-500/30 text-teal-400">
+                <User className="h-7 w-7" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white">Account Profile & Role Switcher</h1>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Currently active in <strong className="text-teal-400 capitalize">{currentUserRole} Portal</strong>
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsEditingAccount(!isEditingAccount)}
+              className="flex items-center space-x-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2 text-xs font-bold text-slate-200 hover:bg-slate-700 transition-all shadow-sm"
+            >
+              <Edit3 className="h-4 w-4 text-teal-400" />
+              <span>{isEditingAccount ? 'Cancel Edit' : 'Edit Profile'}</span>
+            </button>
+          </div>
+
           {isEditingAccount ? (
             <form onSubmit={handleSaveAccount} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                 <div>
-                  <label className="block text-slate-300 mb-1 font-bold">Consumer Full Name</label>
+                  <label className="block text-slate-400 mb-1 font-semibold">Consumer Full Name:</label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white font-bold focus:border-teal-500 focus:outline-none"
-                    required
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white focus:outline-none focus:border-teal-400"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-300 mb-1 font-bold">Electricity Consumer ID</label>
+                  <label className="block text-slate-400 mb-1 font-semibold">Consumer ID Number:</label>
                   <input
                     type="text"
                     value={editConsumerNumber}
                     onChange={(e) => setEditConsumerNumber(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white font-bold focus:border-teal-500 focus:outline-none"
-                    required
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white font-mono focus:outline-none focus:border-teal-400"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-300 mb-1 font-bold">Registered Email</label>
+                  <label className="block text-slate-400 mb-1 font-semibold">Registered Email:</label>
                   <input
                     type="email"
                     value={editEmail}
                     onChange={(e) => setEditEmail(e.target.value)}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white font-bold focus:border-teal-500 focus:outline-none"
-                    required
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white focus:outline-none focus:border-teal-400"
                   />
                 </div>
-
                 <div>
-                  <label className="block text-slate-300 mb-1 font-bold">Tariff Rate (₹/kWh)</label>
+                  <label className="block text-slate-400 mb-1 font-semibold">Electricity Tariff Rate (₹/kWh):</label>
                   <input
                     type="number"
-                    step="0.10"
+                    step="0.1"
                     value={editRate}
                     onChange={(e) => setEditRate(Number(e.target.value))}
-                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white font-bold focus:border-teal-500 focus:outline-none"
-                    required
+                    className="w-full rounded-xl border border-slate-700 bg-slate-950 px-3.5 py-2.5 text-white focus:outline-none focus:border-teal-400"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setIsEditingAccount(false)}
-                  className="rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800"
-                >
-                  Cancel
-                </button>
+              <div className="flex items-center space-x-3 pt-2">
                 <button
                   type="submit"
-                  className="flex items-center space-x-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-teal-500 transition-all"
+                  className="flex items-center space-x-2 rounded-xl bg-teal-500 px-5 py-2.5 text-xs font-bold text-slate-950 hover:bg-teal-400 transition-all shadow-md"
                 >
                   <Save className="h-4 w-4" />
                   <span>Save Profile Updates</span>
@@ -176,25 +161,25 @@ export default function AccountSettingsPage() {
             </form>
           ) : (
             <div className="space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 font-mono">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                  <div className="text-[10px] uppercase text-slate-400 font-bold">Consumer Full Name</div>
-                  <div className="text-base font-extrabold text-white mt-1">{userProfile.name}</div>
+                  <div className="text-[10px] uppercase text-slate-400 font-bold">Consumer Name</div>
+                  <div className="text-sm font-bold text-white mt-1">{userProfile.name}</div>
                 </div>
 
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                  <div className="text-[10px] uppercase text-slate-400 font-bold">Consumer ID</div>
-                  <div className="text-base font-extrabold text-teal-400 mt-1">{userProfile.consumerNumber}</div>
+                  <div className="text-[10px] uppercase text-slate-400 font-bold">Consumer Number</div>
+                  <div className="text-sm font-mono font-bold text-teal-400 mt-1">{userProfile.consumerNumber}</div>
                 </div>
 
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                  <div className="text-[10px] uppercase text-slate-400 font-bold">Registered Email</div>
-                  <div className="text-sm font-extrabold text-slate-200 mt-1 truncate">{userProfile.email}</div>
+                  <div className="text-[10px] uppercase text-slate-400 font-bold">Electricity Provider</div>
+                  <div className="text-sm font-bold text-slate-200 mt-1">{userProfile.electricityDepartment}</div>
                 </div>
 
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
-                  <div className="text-[10px] uppercase text-slate-400 font-bold">Account Meter ID</div>
-                  <div className="text-sm font-bold text-slate-300 mt-1">{userProfile.accountNumber}</div>
+                  <div className="text-[10px] uppercase text-slate-400 font-bold">Billing Account Number</div>
+                  <div className="text-sm font-mono font-bold text-slate-200 mt-1">{userProfile.accountNumber}</div>
                 </div>
 
                 <div className="rounded-xl border border-slate-800 bg-slate-950 p-4">
@@ -213,11 +198,11 @@ export default function AccountSettingsPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
-                    onClick={handleExportData}
+                    onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
                     className="flex items-center space-x-2 rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-xs font-bold text-slate-200 hover:border-teal-500 transition-all shadow-sm"
                   >
                     <Download className="h-4 w-4 text-teal-400" />
-                    <span>Export Account Data (JSON)</span>
+                    <span>Download Telemetry PDF Report</span>
                   </button>
 
                   <button
@@ -239,7 +224,7 @@ export default function AccountSettingsPage() {
                   className="flex items-center space-x-2 rounded-xl bg-rose-600/20 border border-rose-500/50 px-5 py-2.5 text-xs font-bold text-rose-300 hover:bg-rose-600 hover:text-white transition-all shadow-md"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span>Sign Out of Console</span>
+                  <span>Sign Out</span>
                 </button>
               </div>
 
@@ -250,41 +235,56 @@ export default function AccountSettingsPage() {
                 </div>
               )}
 
-              {/* Quick Preset Account Switcher */}
-              <div className="rounded-xl border border-slate-800 bg-slate-950 p-4 space-y-3">
+              {/* Quick Role & Account Switcher */}
+              <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-4">
                 <div className="text-xs font-bold text-slate-300 flex items-center space-x-2">
                   <Building2 className="h-4 w-4 text-teal-400" />
-                  <span>Quick Test Account Switcher</span>
+                  <span>Switch Active Account / Portal Role</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                  {SEEDED_CONSUMERS.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => {
+                        loginAsUser(c.id);
+                        router.push('/');
+                      }}
+                      className="p-3.5 rounded-xl border border-teal-500/30 bg-teal-950/20 hover:border-teal-500 text-left transition-all"
+                    >
+                      <div className="font-bold text-teal-300">{c.name}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{c.blockArea}</div>
+                      <div className="text-[10px] text-teal-400 font-mono mt-1">Resident Portal →</div>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-800">
                   <button
                     type="button"
                     onClick={() => {
-                      loginNormalUser();
+                      loginAsElectrician('elec-vikram');
                       router.push('/');
                     }}
-                    className="flex items-center justify-between rounded-xl border border-teal-500/30 bg-teal-950/30 p-3 hover:border-teal-500 transition-all"
+                    className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-950/20 hover:border-amber-500 text-left transition-all"
                   >
-                    <div>
-                      <div className="font-bold text-teal-300">Normal Household Account</div>
-                      <div className="text-[10px] text-slate-400 font-mono">Consumer: MH-MUM-8921-X</div>
-                    </div>
-                    <ShieldCheck className="h-5 w-5 text-teal-400" />
+                    <div className="font-bold text-amber-300">⚡ Vikram Jadhav (Electrician)</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">Bandra West Queue • 4.9 ★</div>
+                    <div className="text-[10px] text-amber-400 font-mono mt-1">Electrician Portal →</div>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => {
-                      loginSpikedUser();
+                      loginAsAdmin('rukaiya.admin@gmail.com');
                       router.push('/');
                     }}
-                    className="flex items-center justify-between rounded-xl border border-rose-500/30 bg-rose-950/30 p-3 hover:border-rose-500 transition-all"
+                    className="p-3.5 rounded-xl border border-indigo-500/30 bg-indigo-950/20 hover:border-indigo-500 text-left transition-all"
                   >
-                    <div>
-                      <div className="font-bold text-rose-300">Spiked Hazard Test Account</div>
-                      <div className="text-[10px] text-slate-400 font-mono">Simulates Breaker Trip & Alarm</div>
-                    </div>
-                    <AlertCircle className="h-5 w-5 text-rose-400" />
+                    <div className="font-bold text-indigo-300">🛡️ Rukaiya (Admin & Safety Desk)</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">rukaiya.admin@gmail.com</div>
+                    <div className="text-[10px] text-indigo-400 font-mono mt-1">Admin Center →</div>
                   </button>
                 </div>
               </div>

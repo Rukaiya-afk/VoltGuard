@@ -1,22 +1,15 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { 
-  Cpu, 
-  Activity, 
-  DollarSign, 
-  Zap, 
-  FlaskConical
-} from 'lucide-react';
-
 import { Header } from '@/components/Header';
 import { AuthPortal } from '@/components/AuthPortal';
-import { SwitchboardTab } from '@/components/SwitchboardTab';
-import { TelemetryTab } from '@/components/TelemetryTab';
-import { BillingTab } from '@/components/BillingTab';
-import { MLEvalTab } from '@/components/MLEvalTab';
+import { UserPortal } from '@/components/UserPortal';
+import { AdminPortal } from '@/components/AdminPortal';
+import { ElectricianPortal } from '@/components/ElectricianPortal';
 import { ForensicModal } from '@/components/ForensicModal';
 import { AlarmBanner } from '@/components/AlarmBanner';
+import { EmergencyCallModal } from '@/components/EmergencyCallModal';
+import { RatingReviewModal } from '@/components/RatingReviewModal';
 import { useVoltStore } from '@/lib/store';
 import { audioController } from '@/lib/audioController';
 import { TelemetryFrame } from '@/lib/types';
@@ -24,8 +17,7 @@ import { TelemetryFrame } from '@/lib/types';
 export default function DashboardPage() {
   const { 
     isAuthenticated, 
-    activeTab, 
-    setActiveTab, 
+    currentUserRole,
     setTelemetry,
     globalAnomaly,
     forensicAlert,
@@ -83,16 +75,16 @@ export default function DashboardPage() {
 
               if (fault === 'inrush') {
                 I = outlet.rated_current * 2.1;
-                cos = 0.73;
+                cos = 0.72;
                 status = 'inrush';
                 score = 0.28;
               } else if (fault === 'stall' || fault === 'outbreak') {
                 V = 178.0 + (Math.random() * 2 - 1);
                 I = 29.5 + (Math.random() * 1.5);
                 cos = 0.58;
-                T += 2.5;
+                T = Math.min(85.0, T + 3.0);
                 status = 'anomalous';
-                score = 0.92;
+                score = 0.94;
                 alertObj = {
                   outlet_id: id,
                   outlet_name: outlet.name,
@@ -101,15 +93,15 @@ export default function DashboardPage() {
                   current: Math.round(I * 10) / 10,
                   cos_phi: 0.58,
                   temperature: Math.round(T * 10) / 10,
-                  anomaly_score: 0.92,
+                  anomaly_score: 0.94,
                   trip_latency_ms: 12,
-                  diagnosis: `🔥 CRITICAL FIRE OUTBREAK HAZARD: ${outlet.name} overheated to ${Math.round(T)}°C under low voltage brownout (${Math.round(V)}V / ${Math.round(I)}A). Power safely cut in 12ms!`
+                  diagnosis: `🔥 CRITICAL FIRE OUTBREAK HAZARD: ${outlet.name} overheated to ${Math.round(T)}°C under 178V low-voltage stall. Power safely cut in 12ms!`
                 };
               } else if (fault === 'micro_arc') {
                 V = 208.0;
                 I = outlet.rated_current + Math.random() * 6;
                 cos = 0.78;
-                T += 2.0;
+                T = Math.min(80.0, T + 2.0);
                 status = 'anomalous';
                 score = 0.84;
                 alertObj = {
@@ -122,7 +114,7 @@ export default function DashboardPage() {
                   temperature: Math.round(T * 10) / 10,
                   anomaly_score: 0.84,
                   trip_latency_ms: 14,
-                  diagnosis: `Sparking Hazard Cutoff: Sparking loose contact detected on ${outlet.name}. Power safely cut.`
+                  diagnosis: `Sparking Hazard Cutoff: Loose contact micro-arcing on ${outlet.name}. Power safely cut.`
                 };
               }
 
@@ -146,8 +138,16 @@ export default function DashboardPage() {
                   forensicAlert: alertObj,
                   forensicModalOpen: true,
                   safetyLatchLocked: true,
-                  globalAnomaly: true
+                  globalAnomaly: true,
+                  forensicSnapshot: Object.values(updatedOutlets)
                 });
+
+                if (useVoltStore.getState().settings.autoFireEmergencyCall) {
+                  useVoltStore.getState().triggerFireEmergencyProtocol(
+                    outlet.name,
+                    alertObj.diagnosis
+                  );
+                }
               }
             });
 
@@ -170,7 +170,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (globalAnomaly && !audioMuted) {
-      const customDataUrl = localStorage.getItem('voltguard_custom_audio') || undefined;
+      const customDataUrl = typeof window !== 'undefined' ? localStorage.getItem('voltguard_custom_audio') || undefined : undefined;
       audioController.playAlarm(settings.alarmTone, settings.alarmVolume, customDataUrl);
     } else {
       audioController.stopSound();
@@ -182,81 +182,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className={`min-h-screen theme-${settings.theme} transition-colors duration-200`}>
+    <div className={`min-h-screen theme-${settings.theme} ${settings.seniorMode ? 'senior-mode' : ''} transition-colors duration-200`}>
       <AlarmBanner />
       <Header />
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
-        
-        {/* Navigation Tabs Bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-between border-b border-slate-800 pb-4 gap-4">
-          
-          <div className="grid grid-cols-2 sm:grid-cols-4 rounded-2xl bg-slate-900 p-1 border border-slate-800 text-xs font-semibold w-full sm:w-auto gap-1">
-            <button
-              onClick={() => setActiveTab('switchboard')}
-              className={`flex items-center justify-center space-x-2 rounded-xl px-3.5 py-2.5 transition-all ${
-                activeTab === 'switchboard'
-                  ? 'bg-teal-700 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Cpu className="h-4 w-4" />
-              <span>Appliance Switches</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('telemetry')}
-              className={`flex items-center justify-center space-x-2 rounded-xl px-3.5 py-2.5 transition-all ${
-                activeTab === 'telemetry'
-                  ? 'bg-teal-700 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <Activity className="h-4 w-4" />
-              <span>Live Graphs</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('billing')}
-              className={`flex items-center justify-center space-x-2 rounded-xl px-3.5 py-2.5 transition-all ${
-                activeTab === 'billing'
-                  ? 'bg-teal-700 text-white shadow-md'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              <DollarSign className="h-4 w-4" />
-              <span>Bill & Savings</span>
-            </button>
-
-            {/* NEW TAB FOR PROFESSOR / EVALUATOR */}
-            <button
-              onClick={() => setActiveTab('ml-eval')}
-              className={`flex items-center justify-center space-x-2 rounded-xl px-3.5 py-2.5 transition-all ${
-                activeTab === 'ml-eval'
-                  ? 'bg-amber-600 text-white shadow-md font-bold'
-                  : 'text-slate-400 hover:text-amber-400'
-              }`}
-            >
-              <FlaskConical className="h-4 w-4" />
-              <span>ML Test Bench</span>
-            </button>
-          </div>
-
-          <div className="hidden lg:flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-900/50 px-3 py-1.5 rounded-xl border border-slate-800">
-            <Zap className="h-3.5 w-3.5 text-teal-400" />
-            <span>Smart Fire Protection Active</span>
-          </div>
-
-        </div>
-
-        {/* Tab Content Views */}
-        {activeTab === 'switchboard' && <SwitchboardTab />}
-        {activeTab === 'telemetry' && <TelemetryTab />}
-        {activeTab === 'billing' && <BillingTab />}
-        {activeTab === 'ml-eval' && <MLEvalTab />}
-
+        {currentUserRole === 'user' && <UserPortal />}
+        {currentUserRole === 'electrician' && <ElectricianPortal />}
+        {currentUserRole === 'admin' && <AdminPortal />}
       </main>
 
+      <EmergencyCallModal />
+      <RatingReviewModal />
       <ForensicModal />
     </div>
   );
