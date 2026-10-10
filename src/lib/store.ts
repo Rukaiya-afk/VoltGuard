@@ -1159,7 +1159,57 @@ export const useVoltStore = create<VoltGuardState>()(
       },
     }),
     {
-      name: 'voltguard-storage',
+      name: 'voltguard-kothrud-pune-v5',
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        // Cleanse user profile to ensure Pune Kothrud
+        if (state.userProfile?.id === 'user-rajesh') {
+          state.userProfile = {
+            ...state.userProfile,
+            consumerNumber: 'MH-PUN-8921-K',
+            address: 'Flat 402, Shanti Sadan, Near Karve Statue, Kothrud, Pune',
+            city: 'Pune',
+            blockArea: 'Kothrud (Paud Road - Block 4)',
+            electricityDepartment: 'MSEDCL (Mahavitaran - Kothrud Sub-division)',
+            pincode: '411038',
+          };
+        }
+        // Always refresh electricians with Pune coverage
+        state.electricians = SEEDED_ELECTRICIANS;
+        // Sanitize tickets
+        if (state.tickets && Array.isArray(state.tickets)) {
+          state.tickets = state.tickets.map((t) => {
+            let addr = t.consumerAddress || '';
+            let area = t.consumerArea || '';
+            let dept = t.consumerDepartment || '';
+
+            if (addr.includes('Bandra') || addr.includes('Mumbai') || addr.includes('14th Road') || addr.includes('Shanti Sadan')) {
+              addr = 'Flat 402, Shanti Sadan, Near Karve Statue, Kothrud, Pune';
+              area = 'Kothrud (Paud Road - Block 4)';
+              dept = 'MSEDCL (Mahavitaran - Kothrud)';
+            } else if (addr.includes('Powai') || addr.includes('Hiranandani') || addr.includes('Dahanukar')) {
+              addr = 'Tower B-1204, Dahanukar Colony, Karve Nagar, Pune';
+              area = 'Dahanukar Colony / Karve Nagar, Pune';
+              dept = 'MSEDCL (Mahavitaran - Karve Nagar)';
+            } else if (addr.includes('Juhu') || addr.includes('Versova') || addr.includes('Mayur Colony')) {
+              addr = 'Bungalow 7, Mayur Colony, Kothrud, Pune';
+              area = 'Mayur Colony / Ideal Colony, Kothrud';
+              dept = 'MSEDCL (Mahavitaran - Pune West)';
+            }
+
+            if (dept.includes('Tata Power') || dept.includes('Adani')) {
+              dept = 'MSEDCL (Mahavitaran - Pune)';
+            }
+
+            return {
+              ...t,
+              consumerAddress: addr,
+              consumerArea: area,
+              consumerDepartment: dept,
+            };
+          });
+        }
+      },
       partialize: (state) => ({
         settings: state.settings,
         userProfile: state.userProfile,
@@ -1172,3 +1222,13 @@ export const useVoltStore = create<VoltGuardState>()(
     }
   )
 );
+
+// Auto-clean old storage keys in browser
+if (typeof window !== 'undefined') {
+  try {
+    const legacyKeys = ['voltguard-storage', 'voltguard-storage-v2', 'voltguard-storage-v3', 'voltguard-storage-v4'];
+    legacyKeys.forEach((k) => window.localStorage.removeItem(k));
+  } catch {
+    // Ignore in SSR/incognito
+  }
+}
