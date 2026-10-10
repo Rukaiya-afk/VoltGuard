@@ -328,13 +328,13 @@ export function setBreakerEngine(outletId: string, state: BreakerState) {
 
 export function getBillingCensusData() {
   return {
-    consumer_number: 'MH-MUM-8921-X',
+    consumer_number: 'MH-PUN-8921-K',
     consumer_name: 'Rajesh Sharma',
     bill_number: 'ACC-2026-9941',
-    tariff_tier: 'Residential LT-1 (Tier 3)',
+    tariff_tier: 'MSEDCL Residential LT-1 (Pune Urban)',
     rate_per_kwh: 8.50,
     sanctioned_load_kw: 7.5,
-    billing_unit_code: 'BU-4022-MUMBAI',
+    billing_unit_code: 'BU-4110-KOTHRUD-PUNE',
     month_consumed_kwh: 482.5,
     projected_bill_inr: 4101.25,
     outlier_waste_kwh: 34.2,

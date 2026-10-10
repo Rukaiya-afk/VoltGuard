@@ -313,7 +313,7 @@ export const AdminPortal: React.FC = () => {
           <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
             <h4 className="text-sm font-bold text-white flex items-center space-x-2">
               <Radio className="w-4 h-4 text-rose-400 animate-pulse" />
-              <span>Recent Incident Snapshot (Kitchen Water Heater — Bandra West)</span>
+              <span>Recent Incident Snapshot (Kitchen Water Heater — Paud Road, Kothrud)</span>
             </h4>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

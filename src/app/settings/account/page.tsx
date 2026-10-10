@@ -270,7 +270,7 @@ export default function AccountSettingsPage() {
                     className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-950/20 hover:border-amber-500 text-left transition-all"
                   >
                     <div className="font-bold text-amber-300">⚡ Vikram Jadhav (Electrician)</div>
-                    <div className="text-[10px] text-slate-400 mt-0.5">Bandra West Queue • 4.9 ★</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">Kothrud, Pune Division • 4.9 ★</div>
                     <div className="text-[10px] text-amber-400 font-mono mt-1">Electrician Portal →</div>
                   </button>
 

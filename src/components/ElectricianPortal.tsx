@@ -522,7 +522,7 @@ export const ElectricianPortal: React.FC = () => {
                 required
                 value={fieldIssueTitle}
                 onChange={(e) => setFieldIssueTitle(e.target.value)}
-                placeholder="e.g. High neutral-to-earth leakage detected on Bandra block substation"
+                placeholder="e.g. High neutral-to-earth leakage detected on Kothrud Paud Road feeder substation"
                 className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
               />
             </div>

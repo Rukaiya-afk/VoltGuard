@@ -149,7 +149,7 @@ export interface ElectricianProfile {
   qualifications: string; // e.g., "Diploma in Electrical Engineering, Govt Licensed Wireman Grade A"
   workExperienceYears: number; // e.g., 9
   city: string;
-  dedicatedArea: string; // e.g., "Andheri East & West / Juhu / Bandra"
+  dedicatedArea: string; // e.g., "Kothrud / Paud Road / Karve Nagar / Pune"
   pincodesServed: string[];
   rating: number; // e.g., 4.9
   totalReviews: number;

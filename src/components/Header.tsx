@@ -109,7 +109,7 @@ export const Header: React.FC = () => {
             </div>
             <div className="text-[10px] text-slate-400 font-mono">
               {currentUserRole === 'user' && `${userProfile.consumerNumber} • ${userProfile.blockArea}`}
-              {currentUserRole === 'electrician' && `${electricianProfile?.dedicatedArea || 'Bandra West'} • 4.9 ★`}
+              {currentUserRole === 'electrician' && `${electricianProfile?.dedicatedArea || 'Kothrud, Pune'} • 4.9 ★`}
               {currentUserRole === 'admin' && adminProfile.email}
             </div>
           </div>

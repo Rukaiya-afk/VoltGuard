@@ -9,30 +9,30 @@ import {
   AlertOctagon, 
   MessageSquare, 
   PhoneCall, 
-  Settings as SettingsIcon,
   Download,
   Calendar,
   Clock,
   MapPin,
   Star,
   CheckCircle2,
-  ShieldAlert,
   Send,
   Building,
   Flame,
   Wrench,
   Award,
   Phone,
-  RefreshCcw,
-  Sparkles
+  ShieldCheck,
+  FileCheck
 } from 'lucide-react';
 import { useVoltStore } from '@/lib/store';
 import { SwitchboardTab } from '@/components/SwitchboardTab';
 import { TelemetryTab } from '@/components/TelemetryTab';
 import { BillingTab } from '@/components/BillingTab';
-import { exportTelemetryReportPdf } from '@/lib/pdfGenerator';
-import { audioController } from '@/lib/audioController';
-import { AlarmTone } from '@/lib/types';
+import { 
+  exportSafetyAuditPdf, 
+  exportTelemetryReportPdf, 
+  exportBillingDisaggregationPdf 
+} from '@/lib/pdfGenerator';
 
 export const UserPortal: React.FC = () => {
   const { 
@@ -46,8 +46,6 @@ export const UserPortal: React.FC = () => {
     createTicket,
     chatMessages,
     sendChatMessage,
-    settings,
-    updateSettings,
     triggerFireEmergencyProtocol
   } = useVoltStore();
 
@@ -145,7 +143,7 @@ export const UserPortal: React.FC = () => {
             <div className="flex items-center space-x-2">
               <h2 className="text-base md:text-lg font-bold text-white">{userProfile.name}</h2>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
-                Resident Consumer
+                Resident (Kothrud Circle)
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -156,15 +154,15 @@ export const UserPortal: React.FC = () => {
 
         <div className="flex flex-wrap items-center gap-2">
           <button
-            onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
-            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center space-x-1.5 transition"
+            onClick={() => exportSafetyAuditPdf(outlets, userProfile)}
+            className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 flex items-center space-x-1.5 transition shadow-sm"
           >
-            <Download className="w-4 h-4 text-teal-400" />
-            <span>Download PDF Report</span>
+            <FileCheck className="w-4 h-4 text-teal-400" />
+            <span>Download Safety Certificate (PDF)</span>
           </button>
 
           <button
-            onClick={() => triggerFireEmergencyProtocol('Master Bedroom AC', 'Simulated 180V Brownout Overheating (68°C)')}
+            onClick={() => triggerFireEmergencyProtocol('Master Bedroom AC', 'Simulated 180V Brownout Overheating (68°C) in Kothrud')}
             className="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-xs font-bold text-rose-400 flex items-center space-x-1.5 transition"
           >
             <Flame className="w-4 h-4" />
@@ -173,7 +171,7 @@ export const UserPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Senior-Friendly Basic Navigation Tabs */}
+      {/* Senior-Friendly Clean Navigation Tabs (No redundant settings tab) */}
       <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-slate-900 border border-slate-800 rounded-2xl">
         {[
           { id: 'switchboard', label: 'Main Switches', icon: Zap },
@@ -183,7 +181,6 @@ export const UserPortal: React.FC = () => {
           { id: 'report_bug', label: 'Report Issue', icon: AlertOctagon },
           { id: 'chat', label: 'Help Chat', icon: MessageSquare },
           { id: 'call_dept', label: 'Call Electricity Dept', icon: PhoneCall },
-          { id: 'settings', label: 'Settings', icon: SettingsIcon },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = userActiveTab === tab.id;
@@ -212,7 +209,7 @@ export const UserPortal: React.FC = () => {
               <Zap className="w-5 h-5 text-teal-400" />
               <span>Home Appliance Circuit Board</span>
             </h3>
-            <span className="text-xs text-slate-400">Click breaker buttons to simulate safe cutoffs</span>
+            <span className="text-xs text-slate-400">Click breaker switches to turn on/off or test safe cutoff</span>
           </div>
           <SwitchboardTab />
         </div>
@@ -227,14 +224,14 @@ export const UserPortal: React.FC = () => {
                 <Activity className="w-5 h-5 text-teal-400" />
                 <span>Live Power Telemetry & Voltage Chart</span>
               </h3>
-              <p className="text-xs text-slate-400">Updated every second from home smart sensors</p>
+              <p className="text-xs text-slate-400">Live 1-second sensor updates for Kothrud, Paud Road feeder</p>
             </div>
             <button
               onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
               className="px-4 py-2 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs rounded-xl shadow-md flex items-center space-x-1.5 transition"
             >
               <Download className="w-4 h-4" />
-              <span>Export PDF Audit</span>
+              <span>Export Telemetry PDF</span>
             </button>
           </div>
           <TelemetryTab />
@@ -250,14 +247,14 @@ export const UserPortal: React.FC = () => {
                 <DollarSign className="w-5 h-5 text-teal-400" />
                 <span>Electricity Bill & Energy Disaggregation</span>
               </h3>
-              <p className="text-xs text-slate-400">Calculated per sanctioned tariff: ₹{userProfile.ratePerKwh}/kWh</p>
+              <p className="text-xs text-slate-400">MSEDCL Pune LT-1 Residential Tariff Slab (₹{userProfile.ratePerKwh}/kWh)</p>
             </div>
             <button
-              onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
-              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold text-slate-200 rounded-xl flex items-center space-x-1.5 transition"
+              onClick={() => exportBillingDisaggregationPdf(userProfile, 482.5, 4101.25, 34.2, 290.70)}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-md flex items-center space-x-1.5 transition"
             >
-              <Download className="w-4 h-4 text-teal-400" />
-              <span>Save Bill PDF</span>
+              <Download className="w-4 h-4" />
+              <span>Save Monthly Bill PDF</span>
             </button>
           </div>
           <BillingTab />
@@ -270,7 +267,7 @@ export const UserPortal: React.FC = () => {
           <div>
             <h3 className="text-lg font-bold text-white flex items-center space-x-2">
               <UserCheck className="w-5 h-5 text-teal-400" />
-              <span>Certified Electricians in {userProfile.blockArea || 'Your Area'}</span>
+              <span>Certified Electricians in {userProfile.blockArea || 'Kothrud, Pune'}</span>
             </h3>
             <p className="text-xs text-slate-400 mt-1">
               Ranked dynamically by verified customer reviews and prompt resolution ratings.
@@ -294,7 +291,7 @@ export const UserPortal: React.FC = () => {
                   {idx === 0 && (
                     <div className="absolute top-3 right-3 px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold flex items-center space-x-1">
                       <Award className="w-3 h-3" />
-                      <span>TOP RATED</span>
+                      <span>TOP RATED IN PUNE</span>
                     </div>
                   )}
 
@@ -409,7 +406,7 @@ export const UserPortal: React.FC = () => {
                       type="text"
                       value={serviceDesc}
                       onChange={(e) => setServiceDesc(e.target.value)}
-                      placeholder="e.g. Breaker tripped twice today, mild burning smell."
+                      placeholder="e.g. Breaker tripped twice today at Kothrud home, burning smell."
                       className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-teal-400"
                     />
                   </div>
@@ -550,7 +547,7 @@ export const UserPortal: React.FC = () => {
             </div>
 
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
-              <div>📍 Registered Residence: <strong className="text-slate-200">{userProfile.address}</strong></div>
+              <div>📍 Registered Premise: <strong className="text-slate-200">{userProfile.address}</strong></div>
               <div>⚡ Linked Provider: <strong className="text-slate-200">{userProfile.electricityDepartment}</strong></div>
             </div>
 
@@ -650,22 +647,22 @@ export const UserPortal: React.FC = () => {
         </div>
       )}
 
-      {/* TAB CONTENT: Call Electricity Dept */}
+      {/* TAB CONTENT: Call Electricity Dept (Pune & Kothrud Focused) */}
       {userActiveTab === 'call_dept' && (
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-bold text-white flex items-center space-x-2">
               <PhoneCall className="w-5 h-5 text-teal-400" />
-              <span>Electricity Department & Emergency Directory</span>
+              <span>Electricity Department & Emergency Directory (Pune / Kothrud)</span>
             </h3>
             <p className="text-xs text-slate-400 mt-1">
-              Direct emergency helplines for grid breakdowns, voltage sags, and fire brigade.
+              Direct emergency helplines for Kothrud grid breakdowns, voltage sags, and Pune Fire Brigade.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             
-            {/* National Fire Emergency */}
+            {/* Pune Fire Brigade - Kothrud Fire Station */}
             <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-950/60 to-red-950/40 border border-rose-500/50 shadow-lg space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
@@ -673,16 +670,16 @@ export const UserPortal: React.FC = () => {
                     <Flame className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Fire Brigade Emergency</h4>
-                    <span className="text-[11px] text-rose-300">National Emergency Services</span>
+                    <h4 className="text-sm font-bold text-white">Pune Fire Brigade (Kothrud Station)</h4>
+                    <span className="text-[11px] text-rose-300">Paud Road, Kothrud Fire Control</span>
                   </div>
                 </div>
-                <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-rose-600 text-white animate-pulse">
+                <span className="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-rose-600 text-white animate-pulse">
                   101 / 112
                 </span>
               </div>
               <p className="text-xs text-slate-300">
-                Call immediately if electrical short circuit caused smoke, sparks, or open flames.
+                Direct hotline for electrical short-circuits, transformer fires, and building evacuation.
               </p>
               <div className="flex space-x-2 pt-1">
                 <a
@@ -690,12 +687,12 @@ export const UserPortal: React.FC = () => {
                   className="flex-1 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 transition"
                 >
                   <Phone className="w-3.5 h-3.5" />
-                  <span>Call 101 Now</span>
+                  <span>Call 101 Fire Hotline</span>
                 </a>
               </div>
             </div>
 
-            {/* Mahavitaran (MSEDCL) */}
+            {/* MSEDCL Central Helpline */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
@@ -703,8 +700,8 @@ export const UserPortal: React.FC = () => {
                     <Building className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Mahavitaran (MSEDCL)</h4>
-                    <span className="text-[11px] text-slate-400">Maharashtra State Electricity Distribution</span>
+                    <h4 className="text-sm font-bold text-white">MSEDCL Mahavitaran (Pune Circle)</h4>
+                    <span className="text-[11px] text-slate-400">Maharashtra State Power Distribution</span>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-teal-300">
@@ -712,7 +709,7 @@ export const UserPortal: React.FC = () => {
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Toll-free 24/7 centralized emergency breakdown and power interruption helpline.
+                Toll-free 24x7 centralized breakdown and power interruption helpline across Pune.
               </p>
               <div className="flex space-x-2 pt-1">
                 <a
@@ -720,12 +717,12 @@ export const UserPortal: React.FC = () => {
                   className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 transition"
                 >
                   <Phone className="w-3.5 h-3.5 text-teal-400" />
-                  <span>Call Helpline 1912</span>
+                  <span>Call 1912 Helpline</span>
                 </a>
               </div>
             </div>
 
-            {/* Tata Power Mumbai */}
+            {/* MSEDCL Kothrud Sub-Division Breakdown Cell */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
@@ -733,29 +730,29 @@ export const UserPortal: React.FC = () => {
                     <Building className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Tata Power Mumbai</h4>
-                    <span className="text-[11px] text-slate-400">Distribution & Power Network</span>
+                    <h4 className="text-sm font-bold text-white">Kothrud Sub-Division Breakdown Cell</h4>
+                    <span className="text-[11px] text-slate-400">Paud Road Local Substation Cell</span>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-blue-300">
-                  19123 / 1800-209-5161
+                  020-2538-2321
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Dedicated 24x7 control room for Mumbai suburban power line breakdowns and transformer faults.
+                Direct engineer on-duty desk for Kothrud, Mayur Colony, and Karve Road feeder trips.
               </p>
               <div className="flex space-x-2 pt-1">
                 <a
-                  href="tel:18002095161"
+                  href="tel:02025382321"
                   className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 transition"
                 >
                   <Phone className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Call 1800-209-5161</span>
+                  <span>Call Kothrud Cell</span>
                 </a>
               </div>
             </div>
 
-            {/* Adani Electricity Mumbai */}
+            {/* Pune Municipal Corporation (PMC) Disaster Helpline */}
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2.5">
@@ -763,124 +760,28 @@ export const UserPortal: React.FC = () => {
                     <Building className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-white">Adani Electricity Mumbai</h4>
-                    <span className="text-[11px] text-slate-400">Suburban Grid Operations</span>
+                    <h4 className="text-sm font-bold text-white">PMC Disaster Management Cell</h4>
+                    <span className="text-[11px] text-slate-400">Emergency City Infrastructure</span>
                   </div>
                 </div>
                 <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-300">
-                  19122 / 1800-532-9998
+                  020-2550-1269
                 </span>
               </div>
               <p className="text-xs text-slate-400">
-                Customer care & emergency high-voltage cable assistance across Mumbai.
+                24/7 disaster cell for street pole short-circuits, tree branch falls on wires, and waterlogging.
               </p>
               <div className="flex space-x-2 pt-1">
                 <a
-                  href="tel:19122"
+                  href="tel:02025501269"
                   className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center space-x-1.5 transition"
                 >
                   <Phone className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Call 19122</span>
+                  <span>Call PMC Disaster Cell</span>
                 </a>
               </div>
             </div>
 
-          </div>
-        </div>
-      )}
-
-      {/* TAB CONTENT: Settings */}
-      {userActiveTab === 'settings' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 max-w-2xl mx-auto shadow-xl">
-          <div className="flex items-center space-x-3">
-            <div className="p-3 bg-teal-500/10 border border-teal-500/30 rounded-xl text-teal-400">
-              <SettingsIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="text-lg font-bold text-white">Safety & Visual Preferences</h3>
-              <p className="text-xs text-slate-400">Customize audible alarm tones, visual themes, and senior citizen modes.</p>
-            </div>
-          </div>
-
-          {/* Visual Theme Picker */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300">Visual Theme:</label>
-            <div className="grid grid-cols-3 gap-2.5">
-              {[
-                { id: 'oled', label: 'OLED Dark', sub: 'True Pitch Black (#000)' },
-                { id: 'slate', label: 'Deep Slate', sub: 'Rich Navy Slate (#0f172a)' },
-                { id: 'light', label: 'Clean Light', sub: 'High Contrast White' },
-              ].map((th) => (
-                <button
-                  key={th.id}
-                  onClick={() => updateSettings({ theme: th.id as any })}
-                  className={`p-3 rounded-xl border text-left text-xs transition-all ${
-                    settings.theme === th.id
-                      ? 'bg-teal-500/20 border-teal-500 text-white font-bold shadow-md'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                  }`}
-                >
-                  <div className="font-bold text-slate-100">{th.label}</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">{th.sub}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Audible Alarm Tone */}
-          <div className="space-y-2">
-            <label className="block text-xs font-semibold text-slate-300">Audible Alarm Tone:</label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              {[
-                { id: 'buzzer', label: 'Industrial Buzzer' },
-                { id: 'siren', label: 'Pulse Siren' },
-                { id: 'chime', label: 'Soft Chime' },
-                { id: 'synth', label: 'Custom Synth' },
-              ].map((tone) => (
-                <button
-                  key={tone.id}
-                  onClick={() => {
-                    updateSettings({ alarmTone: tone.id as AlarmTone });
-                    audioController.previewTone(tone.id as AlarmTone, settings.alarmVolume);
-                  }}
-                  className={`p-2.5 rounded-xl border text-center text-xs transition-all ${
-                    settings.alarmTone === tone.id
-                      ? 'bg-rose-500/20 border-rose-500 text-white font-bold'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
-                  }`}
-                >
-                  {tone.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Senior Accessibility Toggle */}
-          <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-            <div>
-              <div className="text-sm font-semibold text-white">Senior Citizen Mode</div>
-              <div className="text-xs text-slate-400">High contrast buttons, large touch targets, simplified terminology</div>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.seniorMode}
-              onChange={(e) => updateSettings({ seniorMode: e.target.checked })}
-              className="w-5 h-5 accent-teal-500 rounded"
-            />
-          </div>
-
-          {/* Auto Fire Call Toggle */}
-          <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
-            <div>
-              <div className="text-sm font-semibold text-white">Automated Fire Emergency Call & Dispatch</div>
-              <div className="text-xs text-slate-400">Auto-dial resident and Fire Brigade (101) upon critical thermal hazard</div>
-            </div>
-            <input
-              type="checkbox"
-              checked={settings.autoFireEmergencyCall}
-              onChange={(e) => updateSettings({ autoFireEmergencyCall: e.target.checked })}
-              className="w-5 h-5 accent-rose-500 rounded"
-            />
           </div>
         </div>
       )}

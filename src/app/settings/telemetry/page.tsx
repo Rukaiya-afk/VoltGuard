@@ -17,21 +17,21 @@ export default function TelemetrySettingsPage() {
   const rates: Array<{ rate: RefreshRate; title: string; ms: string; desc: string }> = [
     {
       rate: 500,
-      title: 'Ultra Fast',
-      ms: '500 ms',
-      desc: 'Real-time 2Hz streaming frequency. Highest temporal resolution for transient arc detection.'
+      title: 'Fast Refresh',
+      ms: '0.5 sec',
+      desc: 'Instant real-time readings. Best for active monitoring of heavy appliances.'
     },
     {
       rate: 1000,
-      title: 'Balanced Standard',
-      ms: '1000 ms',
-      desc: '1Hz stream refresh rate. Recommended for typical residential monitoring.'
+      title: 'Normal (Recommended)',
+      ms: '1 sec',
+      desc: 'Balanced live updates. Ideal for regular daily home monitoring.'
     },
     {
       rate: 2000,
-      title: 'Eco Power Saver',
-      ms: '2000 ms',
-      desc: '0.5Hz stream refresh rate. Conserves battery and minimizes network traffic.'
+      title: 'Battery Saver',
+      ms: '2 sec',
+      desc: 'Lower update frequency to save phone/laptop battery and internet data.'
     }
   ];
 
@@ -53,7 +53,7 @@ export default function TelemetrySettingsPage() {
               <div className="text-[10px] font-extrabold uppercase tracking-wider text-teal-400 font-mono">Partition 03</div>
               <h1 className="text-2xl font-extrabold text-white flex items-center space-x-2">
                 <Radio className="h-6 w-6 text-teal-400" />
-                <span>Telemetry Refresh Speed</span>
+                <span>Screen Update Speed</span>
               </h1>
             </div>
           </div>
@@ -61,7 +61,7 @@ export default function TelemetrySettingsPage() {
 
         <div className="rounded-2xl border border-slate-800 bg-slate-900/90 p-6 space-y-6 shadow-xl backdrop-blur-md">
           <div className="text-xs font-semibold text-slate-300">
-            Configure how frequently the live circuit telemetry stream updates the dashboard charts and ML isolation forest models.
+            Choose how fast you want the electrical usage charts and numbers on your screen to update.
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
