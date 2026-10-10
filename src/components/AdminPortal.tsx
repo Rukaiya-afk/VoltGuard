@@ -132,16 +132,16 @@ export const AdminPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Admin Tabs */}
-      <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-slate-900 border border-slate-800 rounded-2xl">
+      {/* Admin Tabs (Auto-spaced, No horizontal scroll, Hover-toggle) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 p-2 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
         {[
-          { id: 'overview', label: 'Safety Overview', icon: ShieldCheck },
-          { id: 'users', label: 'User Accounts', icon: Users },
-          { id: 'incidents', label: 'Fire Incidents & Forensics', icon: Flame },
-          { id: 'electricians', label: 'Electrician Roster & Slots', icon: Wrench },
-          { id: 'tickets', label: 'Bug & Support Tickets', icon: Ticket },
-          { id: 'chat', label: 'Support Desk Chat', icon: MessageSquare },
-          { id: 'settings', label: 'Admin Settings', icon: Sliders },
+          { id: 'overview', label: 'Overview', icon: ShieldCheck },
+          { id: 'users', label: 'Residents', icon: Users },
+          { id: 'incidents', label: 'Fire Forensics', icon: Flame },
+          { id: 'electricians', label: 'Electricians', icon: Wrench },
+          { id: 'tickets', label: 'Tickets', icon: Ticket },
+          { id: 'chat', label: 'Help Desk', icon: MessageSquare },
+          { id: 'settings', label: 'Settings', icon: Sliders },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = adminActiveTab === tab.id;
@@ -149,14 +149,15 @@ export const AdminPortal: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setAdminActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-3 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              onMouseEnter={() => setAdminActiveTab(tab.id as any)}
+              className={`flex items-center justify-center space-x-2 px-2.5 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
                 isActive
-                  ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-md shadow-indigo-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/80 hover:scale-[1.01]'
               }`}
             >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className="truncate">{tab.label}</span>
             </button>
           );
         })}

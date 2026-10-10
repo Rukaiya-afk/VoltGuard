@@ -173,16 +173,16 @@ export const ElectricianPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="flex overflow-x-auto no-scrollbar gap-1.5 p-1.5 bg-slate-900 border border-slate-800 rounded-2xl">
+      {/* Navigation Tabs (Auto-spaced, No horizontal scroll, Hover-toggle) */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 p-2 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
         {[
-          { id: 'jobs', label: 'My Assigned Jobs', icon: Wrench },
-          { id: 'slots', label: 'Set Time Slots', icon: Calendar },
+          { id: 'jobs', label: 'My Jobs', icon: Wrench },
+          { id: 'slots', label: 'Time Slots', icon: Calendar },
           { id: 'client_chat', label: 'Client Chat', icon: MessageSquare },
-          { id: 'admin_chat', label: 'Admin Desk Chat', icon: ShieldAlert },
-          { id: 'report', label: 'Report Field Issue', icon: AlertTriangle },
-          { id: 'reviews', label: 'Ratings & Reviews', icon: Star },
-          { id: 'profile', label: 'My Profile & Area', icon: User },
+          { id: 'admin_chat', label: 'Admin Desk', icon: ShieldAlert },
+          { id: 'report', label: 'Field Issue', icon: AlertTriangle },
+          { id: 'reviews', label: 'Ratings', icon: Star },
+          { id: 'profile', label: 'Profile', icon: User },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = electricianActiveTab === tab.id;
@@ -190,14 +190,15 @@ export const ElectricianPortal: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setElectricianActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-4 py-3 rounded-xl text-xs md:text-sm font-bold whitespace-nowrap transition-all shrink-0 ${
+              onMouseEnter={() => setElectricianActiveTab(tab.id as any)}
+              className={`flex items-center justify-center space-x-2 px-2.5 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
                 isActive
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/20'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-lg shadow-amber-500/25 scale-[1.02]'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/80 hover:scale-[1.01]'
               }`}
             >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
+              <Icon className="w-4 h-4 shrink-0" />
+              <span className="truncate">{tab.label}</span>
             </button>
           );
         })}
