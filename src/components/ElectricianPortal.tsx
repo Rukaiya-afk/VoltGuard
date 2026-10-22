@@ -445,12 +445,49 @@ export const ElectricianPortal: React.FC = () => {
       {/* TAB 4: Admin Desk Chat */}
       {electricianActiveTab === 'admin_chat' && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[560px]">
-          <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+          <div className="p-4 bg-slate-950 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h4 className="text-sm font-bold text-white">Central Admin & Grid Desk Chat</h4>
-              <span className="text-xs text-slate-400">Request replacement safety components or report live voltage drops</span>
+              <div className="flex items-center space-x-2">
+                <h4 className="text-sm font-bold text-white">Central Admin & Safety Command Chat</h4>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                  Officer: Rukaiya Admin
+                </span>
+              </div>
+              <span className="text-xs text-slate-400">Direct encrypted uplink to Chief Safety Administrator for clearances & latch resets</span>
             </div>
-            <span className="text-xs text-teal-400 font-mono font-bold">Admin Dispatch</span>
+            
+            <div className="flex items-center space-x-2">
+              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-[11px] font-mono text-emerald-300">
+                Socket.io Active (12ms)
+              </span>
+            </div>
+          </div>
+
+          {/* Quick Technical Clearance Chips */}
+          <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center space-x-2 overflow-x-auto text-[11px]">
+            <span className="text-slate-400 shrink-0 font-semibold">Technical Quick-Sends:</span>
+            <button
+              type="button"
+              onClick={() => setAdminChatInput('Report: Replaced thermal ceramic lug on TCK-1001. Verified 0.0A ground leakage. Requesting safety latch release.')}
+              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+            >
+              🔧 Report Lug Replacement
+            </button>
+            <button
+              type="button"
+              onClick={() => setAdminChatInput('Field Test: Insulation resistance tested at 1.42 Ohms (Norm < 2.0 Ohms). Safe to close circuit.')}
+              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+            >
+              ⚡ Earth Test 1.42Ω Safe
+            </button>
+            <button
+              type="button"
+              onClick={() => setAdminChatInput('Notice: Brownout sag to 182V detected at building distribution panel. Feeder capacitor check recommended.')}
+              className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+            >
+              ⚠️ Report 182V Feeder Sag
+            </button>
           </div>
 
           <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-900/60">
@@ -464,12 +501,12 @@ export const ElectricianPortal: React.FC = () => {
                 const isMe = msg.senderId === currentElec.id;
                 return (
                   <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                    <div className="text-[10px] text-slate-500 mb-0.5 px-1">{msg.senderName} • {msg.timestamp}</div>
+                    <div className="text-[10px] text-slate-400 mb-0.5 px-1 font-mono">{msg.senderName} • {msg.timestamp}</div>
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-xs ${
                         isMe
-                          ? 'bg-indigo-600 text-white rounded-br-none'
-                          : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                          ? 'bg-amber-500 text-slate-950 font-semibold rounded-br-none shadow-sm'
+                          : 'bg-indigo-600/90 text-white rounded-bl-none shadow-sm'
                       }`}
                     >
                       {msg.text}
@@ -486,9 +523,9 @@ export const ElectricianPortal: React.FC = () => {
               value={adminChatInput}
               onChange={(e) => setAdminChatInput(e.target.value)}
               placeholder="Message Admin Desk (e.g. Verified thermal lugs on TCK-1001, requesting safety latch reset)..."
-              className="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-400"
+              className="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-amber-400"
             />
-            <button type="submit" className="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition">
+            <button type="submit" className="p-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-md transition">
               <Send className="w-4 h-4" />
             </button>
           </form>

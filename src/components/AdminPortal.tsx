@@ -22,11 +22,13 @@ import {
   Filter, 
   Activity, 
   Radio,
-  FileText
+  FileText,
+  Cpu
 } from 'lucide-react';
 import { useVoltStore, SEEDED_CONSUMERS } from '@/lib/store';
-import { exportTelemetryReportPdf, exportHazardIncidentReportPdf } from '@/lib/pdfGenerator';
+import { exportHazardIncidentReportPdf } from '@/lib/pdfGenerator';
 import { TicketStatus } from '@/lib/types';
+import { ModelTestingLab } from '@/components/ModelTestingLab';
 
 export const AdminPortal: React.FC = () => {
   const { 
@@ -56,8 +58,37 @@ export const AdminPortal: React.FC = () => {
   const [slotTime, setSlotTime] = useState('11:00 AM - 12:30 PM');
   const [slotAddedNotice, setSlotAddedNotice] = useState(false);
 
-  // Chat State
+  // Chat State: Target 'electrician' vs 'user'
+  const [adminChatTarget, setAdminChatTarget] = useState<'electrician' | 'user'>('electrician');
+  const [selectedChatElectrician, setSelectedChatElectrician] = useState<string>(electricians[0]?.id || 'elec-vikram');
   const [selectedChatUser, setSelectedChatUser] = useState<string>(SEEDED_CONSUMERS[0].id);
+
+  // Sensor Sensitivity State (Standard baseline: 0.75 / 75)
+  const [tempSensitivity, setTempSensitivity] = useState<number>(settings.anomalySensitivity || 0.75);
+  const [isSensitivitySaved, setIsSensitivitySaved] = useState<boolean>(true);
+  const [sensitivityNotice, setSensitivityNotice] = useState<string>('');
+
+  const handleSensitivitySlider = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = parseFloat(e.target.value);
+    setTempSensitivity(val);
+    setIsSensitivitySaved(val === 0.75);
+    setSensitivityNotice('');
+  };
+
+  const handleSaveSensitivity = () => {
+    updateSettings({ anomalySensitivity: tempSensitivity });
+    setIsSensitivitySaved(true);
+    setSensitivityNotice(`Safety sensitivity threshold of ${tempSensitivity.toFixed(2)} saved successfully.`);
+    setTimeout(() => setSensitivityNotice(''), 3000);
+  };
+
+  const handleResetSensitivity = () => {
+    setTempSensitivity(0.75);
+    updateSettings({ anomalySensitivity: 0.75 });
+    setIsSensitivitySaved(true);
+    setSensitivityNotice('Sensor sensitivity reset back to regulatory baseline (75).');
+    setTimeout(() => setSensitivityNotice(''), 3000);
+  };
   const [adminChatInput, setAdminChatInput] = useState('');
 
   // Slot timing submission
@@ -69,22 +100,34 @@ export const AdminPortal: React.FC = () => {
     setTimeout(() => setSlotAddedNotice(false), 2000);
   };
 
-  // Chat send
+  // Chat send: Bidirectional Electrician <-> Admin or User <-> Admin
   const handleAdminSendChat = (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminChatInput.trim()) return;
 
-    const consumer = SEEDED_CONSUMERS.find((c) => c.id === selectedChatUser) || SEEDED_CONSUMERS[0];
-
-    sendChatMessage({
-      senderId: 'admin',
-      senderName: 'VoltGuard Safety Control Desk',
-      senderRole: 'admin',
-      recipientId: consumer.id,
-      recipientName: consumer.name,
-      channel: 'user_admin',
-      text: adminChatInput.trim(),
-    });
+    if (adminChatTarget === 'electrician') {
+      const elec = electricians.find((e) => e.id === selectedChatElectrician) || electricians[0];
+      sendChatMessage({
+        senderId: 'admin',
+        senderName: 'Rukaiya (Chief Safety Administrator)',
+        senderRole: 'admin',
+        recipientId: elec.id,
+        recipientName: elec.name,
+        channel: 'electrician_admin',
+        text: adminChatInput.trim(),
+      });
+    } else {
+      const consumer = SEEDED_CONSUMERS.find((c) => c.id === selectedChatUser) || SEEDED_CONSUMERS[0];
+      sendChatMessage({
+        senderId: 'admin',
+        senderName: 'VoltGuard Safety Control Desk',
+        senderRole: 'admin',
+        recipientId: consumer.id,
+        recipientName: consumer.name,
+        channel: 'user_admin',
+        text: adminChatInput.trim(),
+      });
+    }
 
     setAdminChatInput('');
   };
@@ -95,45 +138,55 @@ export const AdminPortal: React.FC = () => {
     return true;
   });
 
-  const activeChats = chatMessages.filter(
-    (m) => (m.senderId === selectedChatUser && m.recipientId === 'admin') || (m.senderId === 'admin' && m.recipientId === selectedChatUser)
-  );
+  const activeChats = chatMessages.filter((m) => {
+    if (adminChatTarget === 'electrician') {
+      return (
+        m.channel === 'electrician_admin' &&
+        ((m.senderId === 'admin' && m.recipientId === selectedChatElectrician) ||
+         (m.senderId === selectedChatElectrician && m.recipientId === 'admin') ||
+         (m.senderRole === 'electrician' && m.senderId === selectedChatElectrician))
+      );
+    } else {
+      return (
+        m.channel === 'user_admin' &&
+        ((m.senderId === 'admin' && m.recipientId === selectedChatUser) ||
+         (m.senderId === selectedChatUser && m.recipientId === 'admin'))
+      );
+    }
+  });
 
   return (
     <div className="space-y-6">
       
       {/* Admin Header Banner */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 border border-slate-700 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-xl">
+      <div className="bg-gradient-to-r from-indigo-50 via-slate-50 to-blue-50 border border-indigo-200/80 dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950 dark:border-slate-700 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-md dark:shadow-xl">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-indigo-300 font-bold text-xl shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-indigo-100 border border-indigo-300 dark:bg-indigo-500/20 dark:border-indigo-500/40 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-xl shrink-0 shadow-xs">
             🛡️
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-base md:text-lg font-bold text-white">{adminProfile.name}</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+              <h2 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">{adminProfile.name}</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/40">
                 Admin Control Desk
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
               {adminProfile.title} • {adminProfile.email}
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
-            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg flex items-center space-x-1.5 transition"
-          >
-            <Download className="w-4 h-4" />
-            <span>Export Grid Telemetry PDF</span>
-          </button>
+          <span className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-indigo-300 font-mono flex items-center space-x-1.5 shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Grid Status: Monitored Normal</span>
+          </span>
         </div>
       </div>
 
       {/* Admin Tabs (Auto-spaced, No horizontal scroll, Hover-toggle) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 p-2 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 p-2 bg-white/95 border border-slate-200 dark:bg-slate-900/90 dark:border-slate-800 rounded-2xl shadow-sm dark:shadow-xl backdrop-blur-md">
         {[
           { id: 'overview', label: 'Overview', icon: ShieldCheck },
           { id: 'users', label: 'Residents', icon: Users },
@@ -141,6 +194,7 @@ export const AdminPortal: React.FC = () => {
           { id: 'electricians', label: 'Electricians', icon: Wrench },
           { id: 'tickets', label: 'Tickets', icon: Ticket },
           { id: 'chat', label: 'Help Desk', icon: MessageSquare },
+          { id: 'model_testing', label: 'Algorithm Lab', icon: Cpu },
           { id: 'settings', label: 'Settings', icon: Sliders },
         ].map((tab) => {
           const Icon = tab.icon;
@@ -150,10 +204,10 @@ export const AdminPortal: React.FC = () => {
               key={tab.id}
               onClick={() => setAdminActiveTab(tab.id as any)}
               onMouseEnter={() => setAdminActiveTab(tab.id as any)}
-              className={`flex items-center justify-center space-x-2 px-2.5 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
+              className={`flex items-center justify-center space-x-1.5 px-2 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
                 isActive
-                  ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-lg shadow-indigo-500/25 scale-[1.02]'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/80 hover:scale-[1.01]'
+                  ? 'bg-gradient-to-r from-indigo-600/90 to-blue-600/90 text-white shadow-md shadow-indigo-600/20 scale-[1.02]'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/80 hover:scale-[1.01]'
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" />
@@ -169,10 +223,10 @@ export const AdminPortal: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-5 rounded-2xl bg-slate-900 border border-slate-800 shadow-md">
               <div className="text-xs text-slate-400 font-semibold uppercase">Total Monitored Residents</div>
-              <div className="text-2xl font-bold text-white mt-1">3 Accounts Active</div>
+              <div className="text-2xl font-bold text-white mt-1">4 Accounts Active</div>
               <div className="text-xs text-emerald-400 mt-1 flex items-center space-x-1">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>100% Telemetry Online</span>
+                <span>100% Sensors Online</span>
               </div>
             </div>
 
@@ -197,26 +251,6 @@ export const AdminPortal: React.FC = () => {
               <div className="text-2xl font-bold text-white mt-1">0 Fatal Outbreaks</div>
               <div className="text-xs text-emerald-400 mt-1">Sub-20ms Tripping Protected</div>
             </div>
-          </div>
-
-          {/* Quick PDF Report Generator Card */}
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-            <div>
-              <h4 className="text-base font-bold text-white flex items-center space-x-2">
-                <FileText className="w-5 h-5 text-indigo-400" />
-                <span>Download Certified City Grid & Telemetry Report (PDF)</span>
-              </h4>
-              <p className="text-xs text-slate-400 mt-1">
-                Generates a formal, printable PDF document containing all monitored circuit metrics, breaker trip logs, and tariff statistics.
-              </p>
-            </div>
-            <button
-              onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
-              className="px-5 py-3 bg-gradient-to-r from-indigo-500 to-blue-600 hover:from-indigo-400 hover:to-blue-500 text-white font-bold text-xs rounded-xl shadow-lg flex items-center space-x-2 shrink-0 transition"
-            >
-              <Download className="w-4 h-4" />
-              <span>Generate Official PDF</span>
-            </button>
           </div>
         </div>
       )}
@@ -282,11 +316,11 @@ export const AdminPortal: React.FC = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-white flex items-center space-x-2">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center space-x-2">
                 <Flame className="w-5 h-5 text-rose-500" />
                 <span>Fire Hazard Surveillance & Incident Forensics</span>
               </h3>
-              <p className="text-xs text-slate-400">Pre-trip sensor telemetry snapshots, thermal escalation logs, and fire dispatch audit.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Pre-trip sensor telemetry snapshots, thermal escalation logs, and fire dispatch audit.</p>
             </div>
             <button
               onClick={() => {
@@ -311,32 +345,32 @@ export const AdminPortal: React.FC = () => {
             </button>
           </div>
 
-          <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-4">
-            <h4 className="text-sm font-bold text-white flex items-center space-x-2">
-              <Radio className="w-4 h-4 text-rose-400 animate-pulse" />
+          <div className="p-6 bg-white/95 border border-slate-200 dark:bg-slate-900 dark:border-slate-800 rounded-2xl space-y-4 shadow-sm">
+            <h4 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+              <Radio className="w-4 h-4 text-rose-500 animate-pulse" />
               <span>Recent Incident Snapshot (Kitchen Water Heater — Paud Road, Kothrud)</span>
             </h4>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                <div className="text-[11px] text-slate-400">Peak Thermal Surge</div>
-                <div className="text-lg font-bold text-rose-400 mt-0.5">68.5 °C</div>
-                <div className="text-[10px] text-rose-300">Hazard Limit: &gt;65°C</div>
+              <div className="p-3 bg-slate-100/90 rounded-xl border border-slate-200/90 dark:bg-slate-950 dark:border-slate-800 shadow-xs">
+                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Peak Thermal Surge</div>
+                <div className="text-lg font-bold text-rose-600 dark:text-rose-400 mt-0.5">68.5 °C</div>
+                <div className="text-[10px] font-medium text-rose-700 dark:text-rose-300">Hazard Limit: &gt;65°C</div>
               </div>
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                <div className="text-[11px] text-slate-400">Line Brownout Sag</div>
-                <div className="text-lg font-bold text-amber-400 mt-0.5">178.0 V</div>
-                <div className="text-[10px] text-amber-300">Low Sag (&lt;185V)</div>
+              <div className="p-3 bg-slate-100/90 rounded-xl border border-slate-200/90 dark:bg-slate-950 dark:border-slate-800 shadow-xs">
+                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Line Brownout Sag</div>
+                <div className="text-lg font-bold text-amber-600 dark:text-amber-400 mt-0.5">178.0 V</div>
+                <div className="text-[10px] font-medium text-amber-700 dark:text-amber-300">Low Sag (&lt;185V)</div>
               </div>
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                <div className="text-[11px] text-slate-400">Cutoff Trip Speed</div>
-                <div className="text-lg font-bold text-emerald-400 mt-0.5">12 ms</div>
-                <div className="text-[10px] text-emerald-300">Sub-cycle Latching</div>
+              <div className="p-3 bg-slate-100/90 rounded-xl border border-slate-200/90 dark:bg-slate-950 dark:border-slate-800 shadow-xs">
+                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Cutoff Trip Speed</div>
+                <div className="text-lg font-bold text-emerald-700 dark:text-emerald-400 mt-0.5">12 ms</div>
+                <div className="text-[10px] font-medium text-emerald-700 dark:text-emerald-300">Sub-cycle Latching</div>
               </div>
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
-                <div className="text-[11px] text-slate-400">Emergency Dispatch</div>
-                <div className="text-lg font-bold text-blue-400 mt-0.5">101 Alerted</div>
-                <div className="text-[10px] text-blue-300">Electrician Assigned</div>
+              <div className="p-3 bg-slate-100/90 rounded-xl border border-slate-200/90 dark:bg-slate-950 dark:border-slate-800 shadow-xs">
+                <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Emergency Dispatch</div>
+                <div className="text-lg font-bold text-blue-700 dark:text-blue-400 mt-0.5">1921 Alerted</div>
+                <div className="text-[10px] font-medium text-blue-700 dark:text-blue-300">Electrician Assigned</div>
               </div>
             </div>
           </div>
@@ -564,42 +598,145 @@ export const AdminPortal: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 6: Support Desk Chat */}
+      {/* TAB 6: Real-Time Field Electrician & Resident Chat */}
       {adminActiveTab === 'chat' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[560px]">
-          <div className="p-4 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-xs text-slate-400">Chatting with Resident:</span>
-              <select
-                value={selectedChatUser}
-                onChange={(e) => setSelectedChatUser(e.target.value)}
-                className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-semibold focus:outline-none focus:border-indigo-400"
-              >
-                {SEEDED_CONSUMERS.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name} ({c.consumerNumber})</option>
-                ))}
-              </select>
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[590px]">
+          {/* Channel Header & Segmented Target Selector */}
+          <div className="p-4 bg-slate-950 border-b border-slate-800 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setAdminChatTarget('electrician')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                    adminChatTarget === 'electrician'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                      : 'text-slate-400 hover:text-white bg-slate-900'
+                  }`}
+                >
+                  <Wrench className="w-3.5 h-3.5" />
+                  <span>Field Electricians (Real-Time Uplink)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setAdminChatTarget('user')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                    adminChatTarget === 'user'
+                      ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                      : 'text-slate-400 hover:text-white bg-slate-900'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5" />
+                  <span>Resident Inquiries</span>
+                </button>
+              </div>
+
+              {/* Real-Time Socket Connection Pill */}
+              <div className="flex items-center space-x-2">
+                <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="text-[11px] font-mono text-emerald-300">
+                  Socket.io Bridge Active (12ms)
+                </span>
+              </div>
             </div>
-            <span className="text-xs text-indigo-400 font-mono font-bold">Admin Dispatch Channel</span>
+
+            {/* Recipient Selector & Details */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-900">
+              <div className="flex items-center space-x-3 text-xs">
+                <span className="text-slate-400">
+                  {adminChatTarget === 'electrician' ? 'Active Field Technician:' : 'Resident Account:'}
+                </span>
+
+                {adminChatTarget === 'electrician' ? (
+                  <select
+                    value={selectedChatElectrician}
+                    onChange={(e) => setSelectedChatElectrician(e.target.value)}
+                    className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-semibold focus:outline-none focus:border-amber-400"
+                  >
+                    {electricians.map((elec) => (
+                      <option key={elec.id} value={elec.id}>
+                        ⚡ {elec.name} ({elec.rating}★ • {elec.city})
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <select
+                    value={selectedChatUser}
+                    onChange={(e) => setSelectedChatUser(e.target.value)}
+                    className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-semibold focus:outline-none focus:border-indigo-400"
+                  >
+                    {SEEDED_CONSUMERS.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        👤 {c.name} ({c.consumerNumber})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {adminChatTarget === 'electrician' && (
+                <div className="text-[11px] text-slate-400 font-mono">
+                  Channel: <span className="text-amber-400 font-bold">electrician_admin</span> (Encrypted Command Uplink)
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* Quick Clearance Chips for Electricians */}
+          {adminChatTarget === 'electrician' && (
+            <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center space-x-2 overflow-x-auto text-[11px]">
+              <span className="text-slate-400 shrink-0 font-semibold">Quick Clearance:</span>
+              <button
+                type="button"
+                onClick={() => setAdminChatInput('Clearance Granted: Proceed with ceramic terminal lug replacement on TCK-1001.')}
+                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+              >
+                ✅ Grant Lug Replacement
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminChatInput('Requesting live insulation & earth pit resistance test before re-arming breaker.')}
+                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+              >
+                📊 Request Earth Pit Test
+              </button>
+              <button
+                type="button"
+                onClick={() => setAdminChatInput('Virtual Breaker reset approved. Stand clear of switchboard.')}
+                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+              >
+                ⚡ Approve Breaker Reset
+              </button>
+            </div>
+          )}
+
+          {/* Messages Stream */}
           <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-900/60">
             {activeChats.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center text-slate-500 text-xs">
                 <MessageSquare className="w-8 h-8 text-slate-600 mb-2" />
-                <span>No message history with this resident. Type a message below.</span>
+                <span>
+                  {adminChatTarget === 'electrician'
+                    ? 'No message history with this electrician. Send dispatch orders or technical clearances below.'
+                    : 'No message history with this resident. Type a message below.'}
+                </span>
               </div>
             ) : (
               activeChats.map((msg) => {
                 const isMe = msg.senderId === 'admin';
                 return (
                   <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                    <div className="text-[10px] text-slate-500 mb-0.5 px-1">{msg.senderName} • {msg.timestamp}</div>
+                    <div className="text-[10px] text-slate-400 mb-0.5 px-1 font-mono">
+                      {msg.senderName} • {msg.timestamp}
+                    </div>
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-xs ${
                         isMe
-                          ? 'bg-indigo-600 text-white rounded-br-none'
-                          : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                          ? adminChatTarget === 'electrician'
+                            ? 'bg-amber-600/90 text-slate-950 font-semibold rounded-br-none shadow-sm'
+                            : 'bg-indigo-600 text-white rounded-br-none shadow-sm'
+                          : 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-bl-none shadow-sm'
                       }`}
                     >
                       {msg.text}
@@ -610,22 +747,39 @@ export const AdminPortal: React.FC = () => {
             )}
           </div>
 
+          {/* Chat Input Bar */}
           <form onSubmit={handleAdminSendChat} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center space-x-2">
             <input
               type="text"
               value={adminChatInput}
               onChange={(e) => setAdminChatInput(e.target.value)}
-              placeholder="Type official safety instructions or response to resident..."
+              placeholder={
+                adminChatTarget === 'electrician'
+                  ? 'Message field technician (e.g. Clearance granted, diagnostic logs confirmed)...'
+                  : 'Type official safety instructions or response to resident...'
+              }
               className="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-400"
             />
-            <button type="submit" className="p-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-md transition">
+            <button 
+              type="submit" 
+              className={`p-2.5 rounded-xl shadow-md transition text-slate-950 font-bold ${
+                adminChatTarget === 'electrician'
+                  ? 'bg-amber-500 hover:bg-amber-400'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white'
+              }`}
+            >
               <Send className="w-4 h-4" />
             </button>
           </form>
         </div>
       )}
 
-      {/* TAB 7: Admin Settings */}
+      {/* TAB 7: AI Model & Algorithm Verification Lab */}
+      {adminActiveTab === 'model_testing' && (
+        <ModelTestingLab />
+      )}
+
+      {/* TAB 7: Admin Settings & Sensitivity Baseline */}
       {adminActiveTab === 'settings' && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 max-w-2xl mx-auto shadow-xl">
           <div className="flex items-center space-x-3">
@@ -633,27 +787,83 @@ export const AdminPortal: React.FC = () => {
               <Sliders className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Grid Operations & Security Thresholds</h3>
+              <h3 className="text-lg font-bold text-white">Grid Operations & Safety Sensor Thresholds</h3>
               <p className="text-xs text-slate-400">Adjust automated breaker tripping and emergency escalation rules.</p>
             </div>
           </div>
 
+          {/* Strict Safety Mandate Warning Box (Requirement 4) */}
+          <div className="p-4 bg-amber-950/40 border-2 border-amber-500/60 rounded-xl space-y-2 text-xs">
+            <div className="flex items-center space-x-2 text-amber-400 font-extrabold">
+              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+              <span>STRICT SAFETY WARNING: SENSOR MUST FOLLOW A SENSITIVITY OF 75</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Under Maharashtra & Pune electrical safety regulations (IS 732 / NBC 2016), the power sensor MUST strictly follow a calibrated sensitivity threshold of <strong>75 (0.75)</strong>. 
+              Altering this sensitivity risks undetected micro-arcing sparks and low-voltage cable overheating, or causes premature nuisance breaker tripping. 
+              <strong>The sensor will automatically reset back to the sensitive point of 75 unless explicitly saved and authorized by the resident.</strong>
+            </p>
+          </div>
+
+          {sensitivityNotice && (
+            <div className="p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 text-xs font-semibold flex items-center space-x-2">
+              <CheckCircle2 className="w-4 h-4" />
+              <span>{sensitivityNotice}</span>
+            </div>
+          )}
+
           <div className="space-y-4">
             <div>
               <div className="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1">
-                <span>Isolation Forest Anomaly Cutoff Sensitivity:</span>
-                <span className="text-indigo-400 font-mono font-bold">{settings.anomalySensitivity.toFixed(2)}</span>
+                <span>Electrical Safety Sensor Sensitivity:</span>
+                <div className="flex items-center space-x-2 font-mono">
+                  <span className={`text-sm font-bold ${tempSensitivity === 0.75 ? 'text-indigo-400' : 'text-amber-400'}`}>
+                    {tempSensitivity.toFixed(2)}
+                  </span>
+                  {!isSensitivitySaved && (
+                    <span className="text-[10px] text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40 animate-pulse font-sans">
+                      Unsaved (Reverts to 75)
+                    </span>
+                  )}
+                </div>
               </div>
+              
               <input
                 type="range"
                 min="0.50"
                 max="0.95"
-                step="0.05"
-                value={settings.anomalySensitivity}
-                onChange={(e) => updateSettings({ anomalySensitivity: parseFloat(e.target.value) })}
-                className="w-full accent-indigo-500"
+                step="0.01"
+                value={tempSensitivity}
+                onChange={handleSensitivitySlider}
+                className="w-full accent-indigo-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
               />
-              <span className="text-[11px] text-slate-500">Lower triggers earlier; 0.72 is safety standard.</span>
+
+              <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+                <span>0.50 (HighProtection)</span>
+                <span className="font-bold text-amber-400">75 (0.75 Standard Mandatory Baseline)</span>
+                <span>0.95 (HighThreshold)</span>
+              </div>
+
+              {/* Action Buttons: Save or Reset to 75 */}
+              <div className="flex items-center space-x-3 pt-3">
+                <button
+                  type="button"
+                  onClick={handleSaveSensitivity}
+                  className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-1.5"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>Save Sensitivity (Resident Confirmation)</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleResetSensitivity}
+                  className="py-2 px-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700 transition"
+                  title="Reset to 75 standard"
+                >
+                  Reset to 75
+                </button>
+              </div>
             </div>
 
             <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
@@ -665,20 +875,20 @@ export const AdminPortal: React.FC = () => {
                 type="checkbox"
                 checked={settings.autoCutoffEnabled}
                 onChange={(e) => updateSettings({ autoCutoffEnabled: e.target.checked })}
-                className="w-5 h-5 accent-indigo-500 rounded"
+                className="w-5 h-5 accent-indigo-500 rounded cursor-pointer"
               />
             </div>
 
             <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
               <div>
-                <div className="text-sm font-semibold text-white">Automated Fire Brigade (101) Dispatch Gateway</div>
-                <div className="text-xs text-slate-400">Initiates emergency auto-call upon thermal runaway (&gt;65°C)</div>
+                <div className="text-sm font-semibold text-white">Automated Fire & Emergency (1921) Dispatch Gateway</div>
+                <div className="text-xs text-slate-400">Initiates emergency auto-call upon thermal runaway (&gt;65°C) to Pune Emergency</div>
               </div>
               <input
                 type="checkbox"
                 checked={settings.autoFireEmergencyCall}
                 onChange={(e) => updateSettings({ autoFireEmergencyCall: e.target.checked })}
-                className="w-5 h-5 accent-rose-500 rounded"
+                className="w-5 h-5 accent-rose-500 rounded cursor-pointer"
               />
             </div>
           </div>

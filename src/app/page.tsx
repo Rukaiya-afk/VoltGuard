@@ -10,6 +10,7 @@ import { ForensicModal } from '@/components/ForensicModal';
 import { AlarmBanner } from '@/components/AlarmBanner';
 import { EmergencyCallModal } from '@/components/EmergencyCallModal';
 import { RatingReviewModal } from '@/components/RatingReviewModal';
+import { RightBottomBugPane } from '@/components/RightBottomBugPane';
 import { useVoltStore } from '@/lib/store';
 import { audioController } from '@/lib/audioController';
 import { TelemetryFrame } from '@/lib/types';
@@ -118,7 +119,15 @@ export default function DashboardPage() {
                 };
               }
 
-              if (status === 'anomalous') {
+              if (id === 'spiked_heater') {
+                V = 182.0 + (Math.random() * 2 - 1);
+                I = 38.4 + (Math.random() * 0.4 - 0.2);
+                cos = 0.62;
+                T = Math.min(88.0, T + 0.1);
+                status = 'anomalous';
+                score = 0.98;
+                // Spiked account: Do not auto-trip! Must be tripped directly via the app!
+              } else if (status === 'anomalous') {
                 useVoltStore.getState().toggleBreaker(id, 'TRIPPED');
               }
 
@@ -195,6 +204,7 @@ export default function DashboardPage() {
       <EmergencyCallModal />
       <RatingReviewModal />
       <ForensicModal />
+      <RightBottomBugPane />
     </div>
   );
 }
