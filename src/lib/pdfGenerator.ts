@@ -87,7 +87,7 @@ export function exportSafetyAuditPdf(
     ['3', 'Arc Fault Circuit Interruption (AFDD)', 'UL 1699', 'Isolation Forest AI Anomaly Engine Armed', 'PASSED (Active)'],
     ['4', 'Switchboard Lug Thermal Threshold', 'IS 13947', 'Max Temp: 42.1 deg C (Cutoff: 65 deg C)', 'PASSED (Safe Range)'],
     ['5', 'Overvoltage & Surge Protection (SPD)', 'IEC 61643', '230.4 V Nominal Baseline (+-1.8% Sag/Swell)', 'PASSED (Protected)'],
-    ['6', 'Emergency Fire Brigade Auto-SOS Link', 'PMC Fire Norms', 'Connected to Pune Fire Brigade (101 / Kothrud)', 'VERIFIED (Online)'],
+    ['6', 'Emergency Fire Brigade Auto-SOS Link', 'PMC Fire Norms', 'Connected to Pune Emergency Contact (1921 / Pune Control Room)', 'VERIFIED (Online)'],
   ];
 
   autoTable(doc, {
@@ -166,7 +166,7 @@ export function exportSafetyAuditPdf(
   doc.setTextColor(71, 85, 105);
   doc.text('Lead Safety Inspector: Vikram S. Jadhav (License: MH-PUN-ENG-8912)', 22, finalY2 + 13);
   doc.text('Supervising Authority: Pune Municipal Corporation (PMC) Electrical Dept.', 22, finalY2 + 19);
-  doc.text('Emergency Dispatch Cell: Pune Fire Brigade Kothrud Fire Station (101)', 22, finalY2 + 25);
+  doc.text('Emergency Dispatch Cell: Pune Emergency Helpline (1921 / Pune Control Room)', 22, finalY2 + 25);
   doc.text('Digital Verification Key: SHA256-KTH-8921-VG-SAFE-OK', 22, finalY2 + 31);
 
   // Signoff Box on right
@@ -554,7 +554,7 @@ export function exportHazardIncidentReportPdf(
     ['Lug Terminal Temperature', alert.temperature + ' deg C (Critical Fire Outbreak Threshold: >65.0 deg C)'],
     ['AI Anomaly Risk Score', alert.anomaly_score + ' / 1.0 (Critical Shutdown Score: 0.72)'],
     ['Premise Address', userProfile.name + ' | ' + (userProfile.address || 'Kothrud, Pune - 411038')],
-    ['Emergency Dispatch Unit', 'Pune Fire Brigade (101 / Kothrud Station) & MSEDCL Breakdown Cell'],
+    ['Emergency Dispatch Unit', 'Pune Emergency Control Room (1921 / Pune Helpline) & MSEDCL Cell'],
   ];
 
   autoTable(doc, {

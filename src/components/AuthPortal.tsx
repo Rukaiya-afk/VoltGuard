@@ -275,44 +275,104 @@ export const AuthPortal: React.FC = () => {
 
             {selectedRole === 'user' && (
               <div className="space-y-1 text-slate-400 text-[11px]">
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('rajesh.sharma@gmail.com');
+                    setPassword('password123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>👤 <strong>Rajesh Sharma</strong> (Kothrud Senior Resident):</span>
                   <span className="font-mono text-teal-300">rajesh.sharma@gmail.com / password123</span>
-                </div>
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('priya.patel@gmail.com');
+                    setPassword('password123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>👤 <strong>Priya Patel</strong> (Mayur Colony, Kothrud):</span>
                   <span className="font-mono text-teal-300">priya.patel@gmail.com / password123</span>
-                </div>
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('amit.verma@gmail.com');
+                    setPassword('password123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>👤 <strong>Amit Verma</strong> (Karve Nagar, Pune):</span>
                   <span className="font-mono text-teal-300">amit.verma@gmail.com / password123</span>
-                </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('karan.malhotra@gmail.com');
+                    setPassword('password123');
+                  }}
+                  className="w-full flex justify-between items-center bg-rose-950/40 border border-rose-500/40 hover:bg-rose-950/60 p-1.5 rounded-lg text-left transition"
+                >
+                  <span className="text-rose-300">🚨 <strong>Karan Malhotra</strong> (Spiked Hazard - Triggers Alarm):</span>
+                  <span className="font-mono text-rose-300 font-bold">karan.malhotra@gmail.com / password123</span>
+                </button>
               </div>
             )}
 
             {selectedRole === 'electrician' && (
               <div className="space-y-1 text-slate-400 text-[11px]">
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('vikram.electrician@gmail.com');
+                    setPassword('electrician123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>⚡ <strong>Vikram Jadhav</strong> (Kothrud / Paud Road - 4.9★):</span>
                   <span className="font-mono text-amber-300">vikram.electrician@gmail.com / electrician123</span>
-                </div>
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('suresh.electrician@gmail.com');
+                    setPassword('electrician123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>⚡ <strong>Suresh Nair</strong> (Bavdhan / Kothrud - 4.8★):</span>
                   <span className="font-mono text-amber-300">suresh.electrician@gmail.com / electrician123</span>
-                </div>
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('arun.electrician@gmail.com');
+                    setPassword('electrician123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>⚡ <strong>Arun Kumar</strong> (Erandwane / Deccan - 4.9★):</span>
                   <span className="font-mono text-amber-300">arun.electrician@gmail.com / electrician123</span>
-                </div>
+                </button>
               </div>
             )}
 
             {selectedRole === 'admin' && (
               <div className="space-y-1 text-slate-400 text-[11px]">
-                <div className="flex justify-between items-center bg-slate-900/60 p-1.5 rounded-lg">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIdentifier('rukaiya.admin@gmail.com');
+                    setPassword('adminpassword123');
+                  }}
+                  className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
+                >
                   <span>🛡️ <strong>Rukaiya Admin</strong>:</span>
                   <span className="font-mono text-indigo-300">rukaiya.admin@gmail.com / adminpassword123</span>
-                </div>
+                </button>
               </div>
             )}
           </div>

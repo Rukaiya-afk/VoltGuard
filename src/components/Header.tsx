@@ -44,17 +44,16 @@ export const Header: React.FC = () => {
         {/* Brand Logo */}
         <div className="flex items-center space-x-3">
           <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-teal-500/10 border border-teal-500/40 p-2 shadow-sm transition-transform group-hover:scale-105">
-              <Zap className="h-5 w-5 text-teal-400 font-bold" />
-              <div className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-60"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-teal-500"></span>
+            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 p-2 shadow-sm transition-transform group-hover:scale-105">
+              <Zap className="h-4.5 w-4.5 text-teal-300 font-bold" />
+              <div className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                <span className="inline-flex rounded-full h-2 w-2 bg-teal-400/80"></span>
               </div>
             </div>
             <div>
               <div className="flex items-center space-x-1.5">
                 <span className="text-lg font-bold tracking-tight text-white">VoltGuard</span>
-                <span className="rounded bg-teal-950/80 px-1.5 py-0.2 text-[10px] font-bold text-teal-300 border border-teal-800/40">
+                <span className="rounded-md bg-slate-800/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-300 border border-slate-700/60">
                   {currentUserRole === 'user' ? 'Resident' : currentUserRole === 'electrician' ? 'Electrician' : 'Admin'}
                 </span>
               </div>

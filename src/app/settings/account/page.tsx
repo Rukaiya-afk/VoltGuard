@@ -19,7 +19,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { useVoltStore, SEEDED_CONSUMERS, SEEDED_ELECTRICIANS } from '@/lib/store';
-import { exportTelemetryReportPdf } from '@/lib/pdfGenerator';
 
 export default function AccountSettingsPage() {
   const router = useRouter();
@@ -198,15 +197,6 @@ export default function AccountSettingsPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => exportTelemetryReportPdf(outlets, userProfile)}
-                    className="flex items-center space-x-2 rounded-xl border border-slate-700 bg-slate-950 px-4 py-2.5 text-xs font-bold text-slate-200 hover:border-teal-500 transition-all shadow-sm"
-                  >
-                    <Download className="h-4 w-4 text-teal-400" />
-                    <span>Download Telemetry PDF Report</span>
-                  </button>
-
-                  <button
-                    type="button"
                     onClick={() => {
                       setPasswordChangeMsg('Password reset link sent to registered email address!');
                       setTimeout(() => setPasswordChangeMsg(''), 3500);
@@ -237,27 +227,46 @@ export default function AccountSettingsPage() {
 
               {/* Quick Role & Account Switcher */}
               <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 space-y-4">
-                <div className="text-xs font-bold text-slate-300 flex items-center space-x-2">
-                  <Building2 className="h-4 w-4 text-teal-400" />
-                  <span>Switch Active Account / Portal Role</span>
+                <div className="text-xs font-bold text-slate-300 flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Building2 className="h-4 w-4 text-teal-400" />
+                    <span>Switch Active Account / Portal Role</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-mono">4 Resident Accounts Available</span>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  {SEEDED_CONSUMERS.map((c) => (
-                    <button
-                      key={c.id}
-                      type="button"
-                      onClick={() => {
-                        loginAsUser(c.id);
-                        router.push('/');
-                      }}
-                      className="p-3.5 rounded-xl border border-teal-500/30 bg-teal-950/20 hover:border-teal-500 text-left transition-all"
-                    >
-                      <div className="font-bold text-teal-300">{c.name}</div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">{c.blockArea}</div>
-                      <div className="text-[10px] text-teal-400 font-mono mt-1">Resident Portal →</div>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                  {SEEDED_CONSUMERS.map((c) => {
+                    const isSpiked = c.id === 'user-spiked';
+                    return (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => {
+                          loginAsUser(c.id);
+                          router.push('/');
+                        }}
+                        className={`p-3.5 rounded-xl border text-left transition-all relative overflow-hidden ${
+                          isSpiked
+                            ? 'border-rose-500/50 bg-rose-950/20 hover:border-rose-500 hover:bg-rose-950/40'
+                            : 'border-teal-500/30 bg-teal-950/20 hover:border-teal-500'
+                        }`}
+                      >
+                        {isSpiked && (
+                          <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider bg-rose-500 text-white animate-pulse">
+                            🚨 Spiked Load
+                          </div>
+                        )}
+                        <div className={`font-bold ${isSpiked ? 'text-rose-300' : 'text-teal-300'}`}>
+                          {c.name}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">{c.blockArea}</div>
+                        <div className={`text-[10px] font-mono mt-1 ${isSpiked ? 'text-rose-400 font-bold' : 'text-teal-400'}`}>
+                          {isSpiked ? 'Triggers Alarm →' : 'Resident Portal →'}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2 border-t border-slate-800">

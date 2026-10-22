@@ -132,7 +132,7 @@ const defaultOutlets: Record<string, SimulatedOutlet> = {
 // Global in-memory simulation state for serverless execution
 const simulatedOutlets: Record<string, SimulatedOutlet> = { ...defaultOutlets };
 
-function calculateAnomalyScore(
+export function calculateAnomalyScore(
   V: number,
   I: number,
   cos: number,

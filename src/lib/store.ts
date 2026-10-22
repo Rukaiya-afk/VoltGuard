@@ -17,8 +17,11 @@ import {
   UserRole,
   TicketStatus,
   TicketPriority,
-  TicketType
+  TicketType,
+  PaymentReceipt,
+  SpikedHazardNotice
 } from './types';
+import { recordPaymentInDatabase } from './supabaseClient';
 
 export const SEEDED_CONSUMERS: UserProfile[] = [
   {
@@ -70,6 +73,23 @@ export const SEEDED_CONSUMERS: UserProfile[] = [
     accountNumber: 'PUN-KAR-7731',
     billingTier: 'Residential LT-1 (Tier 3)',
     ratePerKwh: 8.90,
+    isHighRisk: true,
+  },
+  {
+    id: 'user-spiked',
+    consumerNumber: 'MH-PUN-9999-SPIKE',
+    name: 'Karan Malhotra (Spiked Load - Hazard Alert)',
+    email: 'karan.malhotra@gmail.com',
+    role: 'user',
+    phone: '+91 98220 19210',
+    address: 'Penthouse 1102, Tejas Height, Near Kothrud Bus Depot, Pune',
+    city: 'Pune',
+    blockArea: 'Kothrud Bus Stand / Paud Road, Pune',
+    pincode: '411038',
+    electricityDepartment: 'MSEDCL (Mahavitaran - Kothrud Sub-division)',
+    accountNumber: 'PUN-KTH-9999',
+    billingTier: 'Residential LT-1 (Tier 3 - Overload)',
+    ratePerKwh: 9.20,
     isHighRisk: true,
   },
 ];
@@ -285,8 +305,19 @@ export const INITIAL_CHATS: ChatMessage[] = [
     recipientId: 'admin',
     recipientName: 'Admin Desk',
     channel: 'electrician_admin',
-    text: 'Admin, please note I have reviewed the 5-second forensic telemetry snapshot for TCK-1001. Thermal lug reading reached 68°C under 180V sag. Requesting safety clearance.',
+    text: 'Admin, please note I have reviewed the forensic sensor snapshot for TCK-1001. Thermal lug reading reached 68°C under 180V sag. Requesting safety clearance.',
     timestamp: '11:50 AM',
+  },
+  {
+    id: 'msg-4',
+    senderId: 'admin',
+    senderName: 'Rukaiya (Chief Safety Admin)',
+    senderRole: 'admin',
+    recipientId: 'elec-vikram',
+    recipientName: 'Vikram Jadhav',
+    channel: 'electrician_admin',
+    text: 'Clearance granted Vikram. Isolation Forest anomaly log confirmed sub-cycle breaker trip at 12ms. Proceed with ceramic terminal lug replacement at Rajesh Sharma premise.',
+    timestamp: '11:52 AM',
   }
 ];
 
@@ -426,8 +457,8 @@ interface VoltGuardState {
   setUserActiveTab: (tab: 'switchboard' | 'telemetry' | 'billing' | 'electrician' | 'report_bug' | 'chat' | 'call_dept' | 'settings') => void;
 
   // Admin Navigation & Tabs
-  adminActiveTab: 'overview' | 'users' | 'incidents' | 'electricians' | 'tickets' | 'chat' | 'settings';
-  setAdminActiveTab: (tab: 'overview' | 'users' | 'incidents' | 'electricians' | 'tickets' | 'chat' | 'settings') => void;
+  adminActiveTab: 'overview' | 'users' | 'incidents' | 'electricians' | 'tickets' | 'chat' | 'model_testing' | 'settings';
+  setAdminActiveTab: (tab: 'overview' | 'users' | 'incidents' | 'electricians' | 'tickets' | 'chat' | 'model_testing' | 'settings') => void;
 
   // Electrician Navigation & Tabs
   electricianActiveTab: 'jobs' | 'slots' | 'client_chat' | 'admin_chat' | 'report' | 'reviews' | 'profile' | 'settings';
@@ -486,6 +517,16 @@ interface VoltGuardState {
   addCustomOutlet: (outlet: Partial<OutletData>) => void;
   addSavedCard: (card: Omit<SavedCard, 'id'>) => void;
   removeSavedCard: (id: string) => void;
+
+  // Spiked Account Hazard & Alert
+  spikedHazardNotice: SpikedHazardNotice | null;
+  clearSpikedHazard: () => void;
+
+  // Monthly Bill Payment Gateway
+  isBillPaid: boolean;
+  lastPaymentReceipt: PaymentReceipt | null;
+  payElectricityBill: (payment: Omit<PaymentReceipt, 'date'>) => Promise<void>;
+  resetBillPayment: () => void;
 
   // Settings & Theme
   settings: UserSettings;
@@ -546,8 +587,8 @@ export const useVoltStore = create<VoltGuardState>()(
           emergencyCallState: {
             isActive: true,
             type: 'FIRE_DEPARTMENT',
-            recipientName: `Pune Fire Brigade (Kothrud Station) & ${user.name}`,
-            recipientPhone: `101 / ${user.phone}`,
+            recipientName: `Pune Emergency Contact (1921) & ${user.name}`,
+            recipientPhone: `1921 / Pune Emergency Helpline`,
             hazardLocation: user.address,
             outletName,
             diagnosis,
@@ -556,6 +597,40 @@ export const useVoltStore = create<VoltGuardState>()(
           },
         });
       },
+
+      spikedHazardNotice: null,
+      clearSpikedHazard: () => set({ spikedHazardNotice: null, globalAnomaly: false }),
+
+      isBillPaid: false,
+      lastPaymentReceipt: null,
+      payElectricityBill: async (payment) => {
+        const receipt: PaymentReceipt = {
+          ...payment,
+          date: new Date().toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+          }),
+        };
+        set({
+          isBillPaid: true,
+          lastPaymentReceipt: receipt,
+        });
+
+        // Sync with Supabase PostgreSQL cloud database
+        await recordPaymentInDatabase({
+          consumerNumber: payment.consumerNumber,
+          consumerName: get().userProfile.name,
+          billingMonth: 'October 2026',
+          amount: payment.amount,
+          paymentMethod: payment.method,
+          transactionId: payment.transactionId,
+          vpaOrCardMasked: payment.vpaOrMasked,
+        });
+      },
+      resetBillPayment: () => set({ isBillPaid: false, lastPaymentReceipt: null }),
 
       ratingModalTicket: null,
       openRatingModal: (ticket) => set({ ratingModalTicket: ticket }),
@@ -608,11 +683,53 @@ export const useVoltStore = create<VoltGuardState>()(
 
       loginAsUser: (userId: string) => {
         const found = SEEDED_CONSUMERS.find((c) => c.id === userId) || SEEDED_CONSUMERS[0];
-        set({
-          isAuthenticated: true,
-          currentUserRole: 'user',
-          userProfile: found,
-        });
+        if (userId === 'user-spiked') {
+          const spikedOutlets: Record<string, OutletData> = {
+            ...defaultOutlets,
+            spiked_heater: {
+              id: 'spiked_heater',
+              name: 'Kitchen Heavy Geyser (25A High Surge)',
+              modelNumber: 'Racold Pronto 25A Coil',
+              location: 'Kitchen Utility',
+              rated_current: 16.0,
+              trip_current: 25.0,
+              voltage: 182.0,
+              current: 38.4,
+              cos_phi: 0.62,
+              power_watts: 4330.0,
+              terminal_temp: 84.5,
+              status: 'anomalous',
+              breaker_state: 'CLOSED',
+              fault_mode: 'stall',
+              anomaly_score: 0.98,
+              isUserCreated: false,
+              iotStatus: 'CONNECTED',
+            },
+          };
+          set({
+            isAuthenticated: true,
+            currentUserRole: 'user',
+            userProfile: found,
+            outlets: spikedOutlets,
+            globalAnomaly: true,
+            spikedHazardNotice: {
+              hazard: '🔥 CRITICAL CURRENT SPIKE DETECTED: Kitchen Heavy Geyser current surged to 38.4A (Rating 16A exceeded by 240%) at 84.5°C under 182V low-voltage stall. Severe electrical arc breakdown detected!',
+              immediateFix: 'Immediate Fix: Trip circuit breaker directly via the app below to cut the live circuit and silence the alarm. Do not touch heating appliance. Certified electrician inspection required.',
+              outletId: 'spiked_heater',
+              currentAmps: 38.4,
+              ratedAmps: 16.0,
+              temperature: 84.5,
+            },
+          });
+        } else {
+          set({
+            isAuthenticated: true,
+            currentUserRole: 'user',
+            userProfile: found,
+            globalAnomaly: false,
+            spikedHazardNotice: null,
+          });
+        }
       },
 
       loginAsElectrician: (electricianId: string) => {
@@ -952,6 +1069,53 @@ export const useVoltStore = create<VoltGuardState>()(
             }));
           }, 1200);
         }
+
+        // Real-time simulated response for electrician-admin channel
+        if (msgData.channel === 'electrician_admin') {
+          if (msgData.senderRole === 'electrician') {
+            setTimeout(() => {
+              const currentAdmin = get().currentUserRole === 'admin';
+              if (!currentAdmin) {
+                const autoAdminReply: ChatMessage = {
+                  id: `msg-${Date.now() + 1}`,
+                  senderId: 'admin',
+                  senderName: 'Rukaiya (Chief Safety Administrator)',
+                  senderRole: 'admin',
+                  recipientId: msgData.senderId,
+                  recipientName: msgData.senderName,
+                  channel: 'electrician_admin',
+                  text: `Copy that, ${msgData.senderName}. Central Safety Desk logs acknowledge your update. Field telemetry recorded in Pune MSEDCL log.`,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  isAutoGenerated: true,
+                };
+                set((state) => ({
+                  chatMessages: [...state.chatMessages, autoAdminReply],
+                }));
+              }
+            }, 1400);
+          } else if (msgData.senderRole === 'admin') {
+            setTimeout(() => {
+              const currentElec = get().currentUserRole === 'electrician';
+              if (!currentElec) {
+                const autoElecReply: ChatMessage = {
+                  id: `msg-${Date.now() + 1}`,
+                  senderId: msgData.recipientId,
+                  senderName: msgData.recipientName || 'Vikram Jadhav (Electrician)',
+                  senderRole: 'electrician',
+                  recipientId: 'admin',
+                  recipientName: 'Safety Command Desk',
+                  channel: 'electrician_admin',
+                  text: `Received instructions loud and clear, Admin. Diagnostic probe connected on-site. Testing residual current now.`,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  isAutoGenerated: true,
+                };
+                set((state) => ({
+                  chatMessages: [...state.chatMessages, autoElecReply],
+                }));
+              }
+            }, 1400);
+          }
+        }
       },
 
       setTelemetry: (frame) => {
@@ -1103,11 +1267,49 @@ export const useVoltStore = create<VoltGuardState>()(
           if (state === 'CLOSED') {
             outlets[outletId].fault_mode = 'none';
             outlets[outletId].status = 'normal';
+            // If spiked account closes the spiked circuit, re-trigger alarm
+            if (get().userProfile.id === 'user-spiked' && outletId === 'spiked_heater') {
+              outlets[outletId].current = 38.4;
+              outlets[outletId].voltage = 182.0;
+              outlets[outletId].terminal_temp = 84.5;
+              outlets[outletId].power_watts = 4330.0;
+              outlets[outletId].status = 'anomalous';
+              outlets[outletId].anomaly_score = 0.98;
+              set({
+                outlets,
+                globalAnomaly: true,
+                spikedHazardNotice: {
+                  hazard: '🔥 CRITICAL LOAD SPIKE DETECTED: Kitchen Heavy Geyser current surged to 38.4A (Rating 16A exceeded by 240%) with plug terminal heating to 84.5°C under 182V low-voltage stall. Severe arcing & combustion risk!',
+                  immediateFix: 'Fix Immediately: Trip the smart circuit breaker below to cut the live circuit and silence the alarm. Do not touch or use the water heater until a 4.0mm² heat-resistant cable replacement is completed.',
+                  outletId: 'spiked_heater',
+                  currentAmps: 38.4,
+                  ratedAmps: 16.0,
+                  temperature: 84.5,
+                },
+              });
+              return;
+            }
           } else {
             outlets[outletId].current = 0;
             outlets[outletId].power_watts = 0;
             outlets[outletId].status = 'tripped';
+            // If the spiked outlet was directly tripped via the app, the alarm goes off!
+            if (get().userProfile.id === 'user-spiked' && (outletId === 'spiked_heater' || get().spikedHazardNotice?.outletId === outletId)) {
+              set({
+                globalAnomaly: false,
+                spikedHazardNotice: null,
+              });
+            }
           }
+
+          // If no other closed outlet is anomalous, ensure globalAnomaly is false
+          const hasActiveAnomalies = Object.values(outlets).some(
+            (o) => (o.status === 'anomalous' || o.status === 'outbreak') && o.breaker_state === 'CLOSED'
+          );
+          if (!hasActiveAnomalies && !get().forensicAlert) {
+            set({ globalAnomaly: false });
+          }
+
           set({ outlets });
 
           fetch('/api/backend/trip-breaker', {
@@ -1218,6 +1420,8 @@ export const useVoltStore = create<VoltGuardState>()(
         tickets: state.tickets,
         electricians: state.electricians,
         chatMessages: state.chatMessages,
+        isBillPaid: state.isBillPaid,
+        lastPaymentReceipt: state.lastPaymentReceipt,
       }),
     }
   )

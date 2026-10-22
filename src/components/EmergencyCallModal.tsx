@@ -141,11 +141,11 @@ export const EmergencyCallModal: React.FC = () => {
               <span>Acknowledge & Close Banner</span>
             </button>
             <a
-              href="tel:101"
+              href="tel:1921"
               className="flex-1 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-bold flex items-center justify-center space-x-2 shadow-lg shadow-rose-600/30 transition"
             >
               <Building className="w-4 h-4" />
-              <span>Direct Dial Fire Brigade (101)</span>
+              <span>Direct Dial Pune Emergency Contact (1921)</span>
             </a>
           </div>
         </div>
