@@ -136,7 +136,7 @@ class AudioController {
 
       const pulseGain = ctx.createGain();
       pulseGain.gain.setValueAtTime(1.0, ctx.currentTime);
-      
+
       const lfo = ctx.createOscillator();
       lfo.type = 'square';
       lfo.frequency.setValueAtTime(6, ctx.currentTime); // 6 Hz pulse

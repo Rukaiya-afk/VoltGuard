@@ -20,25 +20,25 @@ export default function ThemeSettingsPage() {
 
   const themes: Array<{ id: ThemeOption; title: string; desc: string; icon: any; bgPreview: string }> = [
     {
-      id: 'oled',
-      title: 'OLED Dark',
-      desc: 'True pitch-black surface optimized for OLED panels and reduced eye fatigue.',
-      icon: Moon,
-      bgPreview: 'bg-black border-slate-800 text-teal-400'
-    },
-    {
       id: 'slate',
-      title: 'Deep Slate',
-      desc: 'Sophisticated dark slate theme with balanced contrast and high readability.',
+      title: 'Industrial SCADA Navy',
+      desc: 'Deep navy telemetry console inspired by electrical SCADA monitoring workstations.',
       icon: Monitor,
-      bgPreview: 'bg-slate-950 border-slate-700 text-teal-400'
+      bgPreview: 'bg-[#111820] border-[#354456] text-[#36B879]'
     },
     {
       id: 'light',
-      title: 'Minimal Light',
-      desc: 'Clean, neutral light surface designed for bright environments with subtle dark accents.',
+      title: 'Soothing Sage Green',
+      desc: 'Muted sage-green and crisp off-white interface with luminous cards and clear typography.',
       icon: Sun,
-      bgPreview: 'bg-slate-100 border-slate-300 text-teal-600'
+      bgPreview: 'bg-[#F5F7F0] border-[#DCE5D9] text-[#347A53]'
+    },
+    {
+      id: 'oled',
+      title: 'OLED Pitch Black',
+      desc: 'True pitch-black surface optimized for OLED panels and battery savings.',
+      icon: Moon,
+      bgPreview: 'bg-black border-[#27272A] text-[#36B879]'
     }
   ];
 

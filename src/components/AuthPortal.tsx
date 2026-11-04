@@ -107,39 +107,39 @@ export const AuthPortal: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black text-slate-100 flex flex-col justify-center items-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#111820] text-[#E8EEF5] flex flex-col justify-center items-center p-4 relative overflow-hidden">
       
       {/* Background Lighting Effects */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#347A53]/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#4B91D9]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="w-full max-w-lg z-10 space-y-6 animate-fadeIn">
         
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-700/80 shadow-md">
-            <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
-            <span className="text-xs font-mono font-bold tracking-wide text-slate-200">
-              VOLTGUARD ⚡ SAFETY ECOSYSTEM
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-[#182431] border border-[#354456] shadow-sm">
+            <Zap className="w-4 h-4 text-[#36B879] fill-current" />
+            <span className="text-xs font-mono font-bold tracking-wide text-white">
+              VOLTGUARD ⚡ INDUSTRIAL SAFETY
             </span>
           </div>
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-white">
             Electrical Safety & Fire Mitigation
           </h1>
-          <p className="text-xs md:text-sm text-slate-400 max-w-md mx-auto">
+          <p className="text-xs md:text-sm text-[#A6B3C1] max-w-md mx-auto">
             Choose your portal role to access resident monitoring, electrician service queue, or safety command desk.
           </p>
         </div>
 
         {/* Portal Role Selector Tabs */}
-        <div className="grid grid-cols-3 gap-2 p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-inner">
+        <div className="grid grid-cols-3 gap-2 p-1.5 bg-[#182431] border border-[#354456] rounded-2xl shadow-sm">
           <button
             type="button"
             onClick={() => handleRoleChange('user')}
             className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
               selectedRole === 'user'
-                ? 'bg-gradient-to-r from-teal-500 to-emerald-600 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                ? 'bg-[#347A53] text-white shadow-sm'
+                : 'text-[#A6B3C1] hover:text-white hover:bg-[#202D3D]'
             }`}
           >
             <User className="w-4 h-4" />
@@ -151,8 +151,8 @@ export const AuthPortal: React.FC = () => {
             onClick={() => handleRoleChange('electrician')}
             className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
               selectedRole === 'electrician'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                ? 'bg-[#E0B34E] text-[#111820] shadow-sm'
+                : 'text-[#A6B3C1] hover:text-white hover:bg-[#202D3D]'
             }`}
           >
             <Wrench className="w-4 h-4" />
@@ -164,8 +164,8 @@ export const AuthPortal: React.FC = () => {
             onClick={() => handleRoleChange('admin')}
             className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center space-y-1 ${
               selectedRole === 'admin'
-                ? 'bg-gradient-to-r from-indigo-500 to-blue-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                ? 'bg-[#4B91D9] text-white shadow-sm'
+                : 'text-[#A6B3C1] hover:text-white hover:bg-[#202D3D]'
             }`}
           >
             <ShieldCheck className="w-4 h-4" />
@@ -174,7 +174,7 @@ export const AuthPortal: React.FC = () => {
         </div>
 
         {/* Main Login Card */}
-        <div className="bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
+        <div className="bg-[#202D3D] border border-[#354456] rounded-2xl p-6 md:p-8 shadow-2xl space-y-5">
           
           <div className="flex items-center justify-between border-b border-slate-800 pb-4">
             <div>

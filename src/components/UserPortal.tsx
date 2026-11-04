@@ -10,25 +10,32 @@ import {
   MessageSquare, 
   PhoneCall, 
   Download,
-  Calendar,
-  Clock,
-  MapPin,
-  Star,
-  CheckCircle2,
-  Send,
-  Building,
-  Flame,
-  Wrench,
-  Award,
-  Phone,
-  ShieldCheck,
-  FileCheck,
-  Smartphone
+  Calendar, 
+  Clock, 
+  MapPin, 
+  Star, 
+  CheckCircle2, 
+  Send, 
+  Building, 
+  Flame, 
+  Wrench, 
+  Award, 
+  Phone, 
+  ShieldCheck, 
+  FileCheck, 
+  Smartphone,
+  Gauge,
+  Thermometer,
+  ShieldAlert,
+  Sliders,
+  TrendingUp,
+  Cpu
 } from 'lucide-react';
 import { useVoltStore } from '@/lib/store';
 import { SwitchboardTab } from '@/components/SwitchboardTab';
 import { TelemetryTab } from '@/components/TelemetryTab';
 import { BillingTab } from '@/components/BillingTab';
+import { ElectricalGauge } from '@/components/ElectricalGauge';
 
 export const UserPortal: React.FC = () => {
   const { 
@@ -42,7 +49,10 @@ export const UserPortal: React.FC = () => {
     createTicket,
     chatMessages,
     sendChatMessage,
-    triggerFireEmergencyProtocol
+    triggerFireEmergencyProtocol,
+    globalAnomaly,
+    safetyLatchLocked,
+    settings
   } = useVoltStore();
 
   // Booking Form State
@@ -70,6 +80,15 @@ export const UserPortal: React.FC = () => {
 
   // Selected Electrician for booking
   const currentElectrician = electricians.find((e) => e.id === selectedElectricianId) || electricians[0];
+
+  // Derived real-time electrical metrics (Section 8: Main Dashboard Visual Hierarchy)
+  const outletList = Object.values(outlets);
+  const activeCircuitsCount = outletList.filter(o => o.breaker_state === 'CLOSED').length;
+  const totalCircuitsCount = outletList.length;
+  const totalPowerWatts = outletList.filter(o => o.breaker_state === 'CLOSED').reduce((acc, o) => acc + o.power_watts, 0);
+  const mainsVoltage = outletList[0]?.voltage || 230.0;
+  const peakTemperature = Math.max(...outletList.map(o => o.terminal_temp), 32.0);
+  const hasCriticalAnomaly = globalAnomaly || outletList.some(o => o.status === 'anomalous' || o.breaker_state === 'TRIPPED');
 
   const handleBookSlot = (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,11 +217,8 @@ export const UserPortal: React.FC = () => {
   };
 
   const handleShareSensorReadings = () => {
-    const list = Object.values(outlets);
-    const activeLoads = list.filter((o) => o.breaker_state === 'CLOSED');
-    const netW = activeLoads.reduce((acc, o) => acc + o.power_watts, 0);
-    const maxT = Math.max(...list.map((o) => o.terminal_temp), 32);
-    const summary = `⚡ Live Electrical Sensor Summary: ${activeLoads.length} Active Circuits | Total Power: ${Math.round(netW)}W | Peak Plug Temp: ${maxT.toFixed(1)}°C | Mains: ${list[0]?.voltage || 230}V. Status: Monitored normal.`;
+    const activeLoads = outletList.filter((o) => o.breaker_state === 'CLOSED');
+    const summary = `⚡ Live Electrical Sensor Summary: ${activeLoads.length} Active Circuits | Total Power: ${Math.round(totalPowerWatts)}W | Peak Plug Temp: ${peakTemperature.toFixed(1)}°C | Mains: ${mainsVoltage.toFixed(1)}V. Status: Monitored normal.`;
     setChatInput(summary);
   };
 
@@ -216,21 +232,139 @@ export const UserPortal: React.FC = () => {
   return (
     <div className="space-y-6">
       
-      {/* Consumer Quick Context Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-lg">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-bold text-lg shrink-0">
+      {/* =========================================================================
+          SECTION 8: EXECUTIVE DASHBOARD TELEMETRY & GAUGES ROW (Ref 1, 2, 3)
+          ========================================================================= */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        
+        {/* Metric 1: Total Power Draw */}
+        <div className="p-4 rounded-2xl border bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] shadow-sm transition-all hover:scale-[1.01]">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
+              Total Power Draw
+            </span>
+            <div className="p-1.5 rounded-lg bg-[#36B879]/10 text-[#36B879] theme-light:bg-[#E8EFDF] theme-light:text-[#347A53]">
+              <Zap className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-black font-mono tracking-tight text-white theme-light:text-[#26382D]">
+            {Math.round(totalPowerWatts).toLocaleString()}
+            <span className="text-xs font-semibold ml-1 text-[#A6B3C1] theme-light:text-[#69776C]">W</span>
+          </div>
+          <div className="mt-1 text-[11px] text-[#36B879] theme-light:text-[#347A53] flex items-center space-x-1 font-semibold">
+            <TrendingUp className="h-3 w-3" />
+            <span>Aggregate Home Load</span>
+          </div>
+        </div>
+
+        {/* Metric 2: Mains Line Voltage */}
+        <div className="p-4 rounded-2xl border bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] shadow-sm transition-all hover:scale-[1.01]">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
+              Mains Voltage
+            </span>
+            <div className="p-1.5 rounded-lg bg-[#4B91D9]/10 text-[#4B91D9] theme-light:bg-[#E8EFDF] theme-light:text-[#2A6F97]">
+              <Activity className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-black font-mono tracking-tight text-white theme-light:text-[#26382D]">
+            {mainsVoltage.toFixed(1)}
+            <span className="text-xs font-semibold ml-1 text-[#A6B3C1] theme-light:text-[#69776C]">V</span>
+          </div>
+          <div className="mt-1 text-[11px] text-[#A6B3C1] theme-light:text-[#69776C] flex items-center space-x-1">
+            <span>Grid Standard: 230V AC</span>
+          </div>
+        </div>
+
+        {/* Metric 3: Active Circuits */}
+        <div className="p-4 rounded-2xl border bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] shadow-sm transition-all hover:scale-[1.01]">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
+              Monitored Circuits
+            </span>
+            <div className="p-1.5 rounded-lg bg-[#E0B34E]/10 text-[#E0B34E] theme-light:bg-[#E8EFDF] theme-light:text-[#B87A24]">
+              <Gauge className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-2 text-2xl font-black font-mono tracking-tight text-white theme-light:text-[#26382D]">
+            {activeCircuitsCount}
+            <span className="text-xs font-semibold ml-1 text-[#A6B3C1] theme-light:text-[#69776C]">/ {totalCircuitsCount} Live</span>
+          </div>
+          <div className="mt-1 text-[11px] text-[#36B879] theme-light:text-[#347A53] flex items-center space-x-1 font-semibold">
+            <CheckCircle2 className="h-3 w-3" />
+            <span>Digital Twin Synced</span>
+          </div>
+        </div>
+
+        {/* Metric 4: Safety & Fire Status */}
+        <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
+          hasCriticalAnomaly
+            ? 'bg-rose-500/10 border-rose-500/50 text-rose-300'
+            : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D]'
+        }`}>
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
+              Safety Status
+            </span>
+            <div className={`p-1.5 rounded-lg ${
+              hasCriticalAnomaly 
+                ? 'bg-rose-600 text-white animate-pulse' 
+                : 'bg-[#36B879]/10 text-[#36B879] theme-light:bg-[#E8EFDF] theme-light:text-[#347A53]'
+            }`}>
+              {hasCriticalAnomaly ? <Flame className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+            </div>
+          </div>
+          <div className="mt-2 text-xl font-black tracking-tight">
+            {hasCriticalAnomaly ? (
+              <span className="text-rose-400 font-mono">CIRCUIT ANOMALY</span>
+            ) : (
+              <span className="text-[#36B879] theme-light:text-[#347A53]">OPTIMAL / SAFE</span>
+            )}
+          </div>
+          <div className="mt-1 text-[11px] text-[#A6B3C1] theme-light:text-[#69776C]">
+            Lug Peak: <strong className="font-mono text-white theme-light:text-[#26382D]">{peakTemperature.toFixed(1)}°C</strong>
+          </div>
+        </div>
+
+      </div>
+
+      {/* Semicircular Telemetry Gauges Banner (Reference Image 3 Inspiration) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <ElectricalGauge
+          value={mainsVoltage}
+          min={160}
+          max={280}
+          unit="V"
+          label="Mains Line 1 Voltage (L1)"
+          warnThreshold={185}
+          critThreshold={250}
+        />
+        <ElectricalGauge
+          value={totalPowerWatts}
+          min={0}
+          max={6000}
+          unit="W"
+          label="Household Power Demand (Total Watts)"
+          warnThreshold={3800}
+          critThreshold={5000}
+        />
+      </div>
+
+      {/* Consumer Quick Context Banner */}
+      <div className="p-4 md:p-5 rounded-2xl border bg-[#202D3D] border-[#354456] theme-light:bg-white theme-light:border-[#DCE5D9] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-xl bg-[#347A53] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
             {userProfile.name.charAt(0)}
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-base md:text-lg font-bold text-white">{userProfile.name}</h2>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/40">
-                Resident (Kothrud Circle)
+              <h2 className="text-base font-bold text-[#E8EEF5] theme-light:text-[#26382D]">{userProfile.name}</h2>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4E4D0] text-[#347A53] border border-[#77A985]">
+                Kothrud LT-1 Resident
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              ID: <strong className="text-slate-200">{userProfile.consumerNumber}</strong> | {userProfile.blockArea} | Provider: <strong className="text-slate-200">{userProfile.electricityDepartment}</strong>
+            <p className="text-xs text-[#A6B3C1] theme-light:text-[#69776C] mt-0.5">
+              Consumer ID: <strong className="font-mono text-white theme-light:text-[#26382D]">{userProfile.consumerNumber}</strong> • {userProfile.blockArea} • Rate: <strong className="font-mono text-white theme-light:text-[#26382D]">₹{userProfile.ratePerKwh}/kWh</strong>
             </p>
           </div>
         </div>
@@ -238,22 +372,23 @@ export const UserPortal: React.FC = () => {
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => triggerFireEmergencyProtocol('Master Bedroom AC', 'Simulated 180V Brownout Overheating (68°C) in Kothrud')}
-            className="px-3.5 py-2 rounded-xl bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/40 text-xs font-bold text-rose-400 flex items-center space-x-1.5 transition"
+            className="px-3.5 py-2 rounded-xl bg-rose-600/15 hover:bg-rose-600/25 border border-rose-500/40 text-xs font-bold text-rose-400 flex items-center space-x-1.5 transition"
           >
             <Flame className="w-4 h-4" />
-            <span>Test Fire Emergency Call</span>
+            <span>Simulate Fire Hazard Call</span>
           </button>
         </div>
       </div>
 
-      {/* Senior-Friendly Clean Navigation Tabs (Auto-spaced, 5 Core Partitions) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 p-2 bg-slate-900/90 border border-slate-800 rounded-2xl shadow-xl backdrop-blur-md">
+      {/* In-Page Quick Navigation Tabs */}
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl border bg-[#182431] border-[#354456] theme-light:bg-[#E8EFDF] theme-light:border-[#DCE5D9] overflow-x-auto text-xs font-bold">
         {[
-          { id: 'switchboard', label: 'Main Switches', icon: Zap },
-          { id: 'billing', label: 'Monthly Bill', icon: DollarSign },
+          { id: 'switchboard', label: 'Circuit Switchboard', icon: Zap },
+          { id: 'telemetry', label: 'Telemetry Graphs', icon: Activity },
+          { id: 'billing', label: 'Utility Billing & Census', icon: DollarSign },
           { id: 'electrician', label: 'Book Electrician', icon: UserCheck },
-          { id: 'chat', label: 'Help Chat', icon: MessageSquare },
-          { id: 'call_dept', label: 'Call Electricity Dept', icon: PhoneCall },
+          { id: 'chat', label: 'Safety Help Desk & OTP', icon: MessageSquare },
+          { id: 'call_dept', label: 'Emergency Hotlines', icon: PhoneCall },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = userActiveTab === tab.id;
@@ -261,51 +396,49 @@ export const UserPortal: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setUserActiveTab(tab.id as any)}
-              onMouseEnter={() => setUserActiveTab(tab.id as any)}
-              className={`flex items-center justify-center space-x-2 px-3 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
+              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap ${
                 isActive
-                  ? 'bg-gradient-to-r from-teal-500 to-emerald-500 text-slate-950 shadow-lg shadow-teal-500/25 scale-[1.02]'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/80 hover:scale-[1.01]'
+                  ? 'bg-[#347A53] text-white shadow-sm'
+                  : 'text-[#A6B3C1] hover:text-white theme-light:text-[#69776C] theme-light:hover:text-[#26382D]'
               }`}
             >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-slate-950' : 'text-teal-400'}`} />
-              <span className="truncate">{tab.label}</span>
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
             </button>
           );
         })}
       </div>
 
-      {/* TAB CONTENT: Main Switches */}
+      {/* =========================================================================
+          TAB CONTENT: Digital Twin Switchboard
+          ========================================================================= */}
       {userActiveTab === 'switchboard' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-base font-bold text-white flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-teal-400" />
-              <span>Home Appliance Circuit Board</span>
-            </h3>
-            <span className="text-xs text-slate-400">Click breaker switches to turn on/off or test safe cutoff</span>
-          </div>
           <SwitchboardTab />
         </div>
       )}
 
-      {/* TAB CONTENT: Monthly Bill */}
+      {/* =========================================================================
+          TAB CONTENT: Live Telemetry
+          ========================================================================= */}
+      {userActiveTab === 'telemetry' && (
+        <div className="space-y-4">
+          <TelemetryTab />
+        </div>
+      )}
+
+      {/* =========================================================================
+          TAB CONTENT: Monthly Bill & Census
+          ========================================================================= */}
       {userActiveTab === 'billing' && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-base font-bold text-white flex items-center space-x-2">
-                <DollarSign className="w-5 h-5 text-teal-400" />
-                <span>Electricity Bill & Energy Disaggregation</span>
-              </h3>
-              <p className="text-xs text-slate-400">MSEDCL Pune LT-1 Residential Tariff Slab (₹{userProfile.ratePerKwh}/kWh)</p>
-            </div>
-          </div>
           <BillingTab />
         </div>
       )}
 
-      {/* TAB CONTENT: Book Electrician */}
+      {/* =========================================================================
+          TAB CONTENT: Book Electrician
+          ========================================================================= */}
       {userActiveTab === 'electrician' && (
         <div className="space-y-6">
           <div>
@@ -531,7 +664,9 @@ export const UserPortal: React.FC = () => {
         </div>
       )}
 
-      {/* TAB CONTENT: Help Chat with Socket.io & Twilio SMS OTP */}
+      {/* =========================================================================
+          TAB CONTENT: Help Chat with Socket.io & Twilio SMS OTP
+          ========================================================================= */}
       {userActiveTab === 'chat' && (
         <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[580px]">
           
@@ -692,7 +827,9 @@ export const UserPortal: React.FC = () => {
         </div>
       )}
 
-      {/* TAB CONTENT: Call Electricity Dept (Pune & Kothrud Focused) */}
+      {/* =========================================================================
+          TAB CONTENT: Call Electricity Dept (Pune & Kothrud Focused)
+          ========================================================================= */}
       {userActiveTab === 'call_dept' && (
         <div className="space-y-6">
           <div>

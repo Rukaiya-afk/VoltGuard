@@ -105,7 +105,9 @@ export const RightBottomBugPane: React.FC = () => {
       {isOpen && (
         <aside 
           aria-label="Bug and Issue Reporting Desk"
-          className={`fixed bottom-6 right-6 z-50 w-[92vw] sm:w-[420px] bg-slate-950/95 border-2 border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden flex flex-col ${
+          className={`fixed bottom-6 right-6 z-50 w-[92vw] sm:w-[420px] rounded-2xl shadow-2xl backdrop-blur-2xl transition-all duration-200 overflow-hidden flex flex-col border
+            bg-[#202D3D] border-[#354456] text-[#E8EEF5]
+            theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] ${
           isMinimized ? 'h-14' : 'max-h-[85vh]'
         }`}>
           

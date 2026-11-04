@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from '@/components/Header';
+import { SidebarNav } from '@/components/SidebarNav';
 import { AuthPortal } from '@/components/AuthPortal';
 import { UserPortal } from '@/components/UserPortal';
 import { AdminPortal } from '@/components/AdminPortal';
@@ -25,6 +26,9 @@ export default function DashboardPage() {
     audioMuted,
     settings
   } = useVoltStore();
+
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -126,7 +130,6 @@ export default function DashboardPage() {
                 T = Math.min(88.0, T + 0.1);
                 status = 'anomalous';
                 score = 0.98;
-                // Spiked account: Do not auto-trip! Must be tripped directly via the app!
               } else if (status === 'anomalous') {
                 useVoltStore.getState().toggleBreaker(id, 'TRIPPED');
               }
@@ -192,15 +195,29 @@ export default function DashboardPage() {
 
   return (
     <div className={`min-h-screen theme-${settings.theme} ${settings.seniorMode ? 'senior-mode' : ''} transition-colors duration-200`}>
-      <AlarmBanner />
-      <Header />
+      {/* Fixed Vertical Navigation Rail */}
+      <SidebarNav
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        mobileOpen={mobileNavOpen}
+        onCloseMobile={() => setMobileNavOpen(false)}
+      />
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
-        {currentUserRole === 'user' && <UserPortal />}
-        {currentUserRole === 'electrician' && <ElectricianPortal />}
-        {currentUserRole === 'admin' && <AdminPortal />}
-      </main>
+      {/* Main Workspace Frame (offset by sidebar on desktop) */}
+      <div className={`min-h-screen flex flex-col transition-all duration-300 ease-in-out ${
+        sidebarCollapsed ? 'lg:pl-[74px]' : 'lg:pl-64'
+      }`}>
+        <AlarmBanner />
+        <Header onToggleMobileNav={() => setMobileNavOpen(true)} />
 
+        <main className="flex-1 mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 space-y-6">
+          {currentUserRole === 'user' && <UserPortal />}
+          {currentUserRole === 'electrician' && <ElectricianPortal />}
+          {currentUserRole === 'admin' && <AdminPortal />}
+        </main>
+      </div>
+
+      {/* Persistent Global Modals */}
       <EmergencyCallModal />
       <RatingReviewModal />
       <ForensicModal />

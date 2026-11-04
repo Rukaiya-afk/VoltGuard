@@ -159,34 +159,49 @@ export const AdminPortal: React.FC = () => {
     <div className="space-y-6">
       
       {/* Admin Header Banner */}
-      <div className="bg-gradient-to-r from-indigo-50 via-slate-50 to-blue-50 border border-indigo-200/80 dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-800 dark:to-indigo-950 dark:border-slate-700 rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-md dark:shadow-xl">
+      <div className="border rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm
+        bg-[#202D3D] border-[#354456] text-[#E8EEF5]
+        theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D]
+      ">
         <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-100 border border-indigo-300 dark:bg-indigo-500/20 dark:border-indigo-500/40 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-xl shrink-0 shadow-xs">
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-xl shrink-0 shadow-xs
+            bg-[#4B91D9]/20 border border-[#4B91D9]/40 text-[#4B91D9]
+            theme-light:bg-[#D4E4D0] theme-light:text-[#347A53] theme-light:border-[#77A985]
+          ">
             🛡️
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h2 className="text-base md:text-lg font-bold text-slate-900 dark:text-white">{adminProfile.name}</h2>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-300 dark:bg-indigo-500/20 dark:text-indigo-300 dark:border-indigo-500/40">
+              <h2 className="text-base md:text-lg font-bold text-white theme-light:text-[#26382D]">{adminProfile.name}</h2>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider
+                bg-[#4B91D9]/20 text-[#4B91D9] border border-[#4B91D9]/40
+                theme-light:bg-[#D4E4D0] theme-light:text-[#347A53] theme-light:border-[#77A985]
+              ">
                 Admin Control Desk
               </span>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+            <p className="text-xs text-[#A6B3C1] theme-light:text-[#69776C] mt-0.5">
               {adminProfile.title} • {adminProfile.email}
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 dark:bg-slate-900 dark:border-slate-800 dark:text-indigo-300 font-mono flex items-center space-x-1.5 shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="px-3 py-1.5 rounded-xl border text-xs font-mono flex items-center space-x-1.5 shadow-xs
+            bg-[#192330] border-[#354456] text-[#36B879]
+            theme-light:bg-[#E8EFDF] theme-light:border-[#DCE5D9] theme-light:text-[#347A53]
+          ">
+            <span className="w-2 h-2 rounded-full bg-[#36B879] theme-light:bg-[#347A53] animate-pulse" />
             <span>Grid Status: Monitored Normal</span>
           </span>
         </div>
       </div>
 
-      {/* Admin Tabs (Auto-spaced, No horizontal scroll, Hover-toggle) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 p-2 bg-white/95 border border-slate-200 dark:bg-slate-900/90 dark:border-slate-800 rounded-2xl shadow-sm dark:shadow-xl backdrop-blur-md">
+      {/* Admin Tabs Bar */}
+      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl border overflow-x-auto text-xs font-bold
+        bg-[#182431] border-[#354456] text-[#A6B3C1]
+        theme-light:bg-[#E8EFDF] theme-light:border-[#DCE5D9] theme-light:text-[#69776C]
+      ">
         {[
           { id: 'overview', label: 'Overview', icon: ShieldCheck },
           { id: 'users', label: 'Residents', icon: Users },
@@ -203,15 +218,14 @@ export const AdminPortal: React.FC = () => {
             <button
               key={tab.id}
               onClick={() => setAdminActiveTab(tab.id as any)}
-              onMouseEnter={() => setAdminActiveTab(tab.id as any)}
-              className={`flex items-center justify-center space-x-1.5 px-2 py-3 rounded-xl text-xs md:text-sm font-bold text-center transition-all duration-200 cursor-pointer select-none ${
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl transition whitespace-nowrap ${
                 isActive
-                  ? 'bg-gradient-to-r from-indigo-600/90 to-blue-600/90 text-white shadow-md shadow-indigo-600/20 scale-[1.02]'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800/80 hover:scale-[1.01]'
+                  ? 'bg-[#347A53] text-white shadow-sm'
+                  : 'hover:text-white theme-light:hover:text-[#26382D]'
               }`}
             >
-              <Icon className="w-4 h-4 shrink-0" />
-              <span className="truncate">{tab.label}</span>
+              <Icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
             </button>
           );
         })}

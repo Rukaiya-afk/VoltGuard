@@ -25,7 +25,10 @@ export const RatingReviewModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6 text-slate-100 relative">
+      <div className="w-full max-w-md rounded-2xl shadow-2xl p-6 relative border
+        bg-[#202D3D] border-[#354456] text-[#E8EEF5]
+        theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D]
+      ">
         <button
           onClick={closeRatingModal}
           className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"

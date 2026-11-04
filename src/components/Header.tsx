@@ -4,21 +4,25 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
-  ShieldCheck, 
   Zap, 
-  Volume2, 
-  VolumeX, 
   RotateCcw, 
   Settings, 
-  UserCheck, 
   LogOut,
-  Wrench,
+  Menu,
+  ShieldAlert,
+  Flame,
+  Volume2,
+  VolumeX,
   User,
-  Flame
+  CheckCircle2
 } from 'lucide-react';
 import { useVoltStore } from '@/lib/store';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onToggleMobileNav?: () => void;
+}
+
+export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
   const pathname = usePathname();
   const { 
     currentUserRole,
@@ -34,137 +38,140 @@ export const Header: React.FC = () => {
     toggleAudioMute,
     globalAnomaly,
     safetyLatchLocked,
-    triggerFireEmergencyProtocol
+    settings,
+    userActiveTab
   } = useVoltStore();
 
+  // Compute breadcrumb title based on route and tab
+  const getSectionTitle = () => {
+    if (pathname.startsWith('/settings')) {
+      return 'System Settings';
+    }
+    if (currentUserRole === 'user') {
+      switch (userActiveTab) {
+        case 'switchboard': return 'Digital Twin Switchboard';
+        case 'telemetry': return 'Live Telemetry Waveforms';
+        case 'billing': return 'Utility Billing & Census';
+        case 'electrician': return 'Certified Electrician Booking';
+        case 'chat': return 'Safety Help Desk & Twilio OTP';
+        case 'call_dept': return 'Electricity Department Clearance';
+        case 'report_bug': return 'Incident & Bug Reporting';
+        default: return 'Resident Monitoring';
+      }
+    } else if (currentUserRole === 'electrician') {
+      return 'Field Pro Dispatch Queue';
+    } else {
+      return 'Safety Command & Control';
+    }
+  };
+
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur-md transition-colors">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 w-full border-b backdrop-blur-md transition-colors
+      bg-[#182431]/95 border-[#354456] text-[#E8EEF5]
+      theme-light:bg-[#E2EBD9]/95 theme-light:border-[#DCE5D9] theme-light:text-[#26382D]
+    "
+    style={{
+      backgroundColor: settings.theme === 'light' ? 'rgba(226, 235, 217, 0.95)' : settings.theme === 'oled' ? 'rgba(0, 0, 0, 0.95)' : 'rgba(24, 36, 49, 0.95)',
+      borderColor: settings.theme === 'light' ? '#DCE5D9' : settings.theme === 'oled' ? '#27272A' : '#354456'
+    }}>
+      <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/* Brand Logo */}
+        {/* Left: Mobile Menu Trigger + Section Breadcrumbs */}
         <div className="flex items-center space-x-3">
-          <Link href="/" className="flex items-center space-x-2.5 group">
-            <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 border border-slate-800 p-2 shadow-sm transition-transform group-hover:scale-105">
-              <Zap className="h-4.5 w-4.5 text-teal-300 font-bold" />
-              <div className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                <span className="inline-flex rounded-full h-2 w-2 bg-teal-400/80"></span>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center space-x-1.5">
-                <span className="text-lg font-bold tracking-tight text-white">VoltGuard</span>
-                <span className="rounded-md bg-slate-800/90 px-1.5 py-0.5 text-[10px] font-bold text-slate-300 border border-slate-700/60">
-                  {currentUserRole === 'user' ? 'Resident' : currentUserRole === 'electrician' ? 'Electrician' : 'Admin'}
-                </span>
-              </div>
-              <div className="text-[10px] text-slate-400">
-                Electrical Safety & Fire Protection
-              </div>
-            </div>
-          </Link>
-        </div>
+          {onToggleMobileNav && (
+            <button
+              onClick={onToggleMobileNav}
+              aria-label="Open Navigation Menu"
+              className="lg:hidden p-2 rounded-xl border border-inherit text-inherit hover:bg-black/10 transition"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          )}
 
-        {/* Quick Portal Switcher */}
-        <div className="hidden lg:flex items-center space-x-1 bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs">
-          <button
-            onClick={() => loginAsUser('user-rajesh')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              currentUserRole === 'user'
-                ? 'bg-teal-500 text-slate-950 shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Resident Portal
-          </button>
-          <button
-            onClick={() => loginAsElectrician('elec-vikram')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              currentUserRole === 'electrician'
-                ? 'bg-amber-500 text-slate-950 shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Electrician Queue
-          </button>
-          <button
-            onClick={() => loginAsAdmin('rukaiya.admin@gmail.com')}
-            className={`px-3 py-1.5 rounded-lg font-bold transition ${
-              currentUserRole === 'admin'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            Admin Center
-          </button>
-        </div>
-
-        {/* User / Profile Info */}
-        <div className="hidden sm:flex items-center space-x-3 rounded-xl border border-slate-800 bg-slate-900/60 px-3.5 py-1.5">
-          <div className="text-right text-xs">
-            <div className="font-bold text-white">
-              {currentUserRole === 'user' && userProfile.name}
-              {currentUserRole === 'electrician' && (electricianProfile?.name || 'Vikram Jadhav')}
-              {currentUserRole === 'admin' && adminProfile.name}
+          <div>
+            <div className="flex items-center space-x-2">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider font-mono
+                ${settings.theme === 'light' ? 'text-[#347A53]' : 'text-[#36B879]'}
+              `}>
+                {currentUserRole === 'user' ? 'Resident Portal' : currentUserRole === 'electrician' ? 'Field Pro Queue' : 'Admin Center'}
+              </span>
+              <span className="text-slate-400 text-xs">/</span>
+              <span className="text-xs font-bold text-inherit truncate">
+                {getSectionTitle()}
+              </span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono">
-              {currentUserRole === 'user' && `${userProfile.consumerNumber} • ${userProfile.blockArea}`}
-              {currentUserRole === 'electrician' && `${electricianProfile?.dedicatedArea || 'Kothrud, Pune'} • 4.9 ★`}
-              {currentUserRole === 'admin' && adminProfile.email}
+            <div className="hidden sm:block text-[11px] opacity-70">
+              {currentUserRole === 'user' && `${userProfile.blockArea || 'Kothrud, Pune'} • ${userProfile.electricityDepartment || 'MSEDCL LT-1'}`}
+              {currentUserRole === 'electrician' && `${electricianProfile?.dedicatedArea || 'Kothrud, Pune'} • 4.9 ★ Pro Verified`}
+              {currentUserRole === 'admin' && 'Central Safety & Mitigation Command Desk'}
             </div>
           </div>
         </div>
 
-        {/* Quick-Access Control Buttons */}
+        {/* Right Action Controls */}
         <div className="flex items-center space-x-2 sm:space-x-3">
           
-          {/* Global Safety Reset */}
+          {/* Global Safety Reset Button */}
           <button
             onClick={globalSafetyReset}
             title="Reset Safety Latch & Restore Circuits"
-            className={`flex items-center space-x-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shadow-sm ${
               globalAnomaly || safetyLatchLocked
-                ? 'bg-rose-600 text-white hover:bg-rose-500 animate-bounce shadow-md shadow-rose-600/40'
-                : 'bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700'
+                ? 'bg-rose-600 text-white hover:bg-rose-500 animate-pulse ring-2 ring-rose-400/50 shadow-md shadow-rose-600/30'
+                : settings.theme === 'light'
+                ? 'bg-white border border-[#DCE5D9] text-[#26382D] hover:bg-[#F5F7F0]'
+                : 'bg-[#202D3D] border border-[#354456] text-[#E8EEF5] hover:bg-[#273648]'
             }`}
           >
             <RotateCcw className={`h-3.5 w-3.5 ${globalAnomaly ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Reset Safety</span>
+            <span className="hidden sm:inline">Reset Safety Latch</span>
           </button>
 
-          {/* Mute / Unmute */}
+          {/* Audio Mute / Unmute */}
           <button
             onClick={toggleAudioMute}
             title={audioMuted ? 'Unmute Alarms' : 'Mute Alarms'}
             className={`rounded-xl p-2 transition-colors border ${
               audioMuted
                 ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
-                : 'border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white'
+                : settings.theme === 'light'
+                ? 'border-[#DCE5D9] bg-white text-[#347A53] hover:bg-[#F5F7F0]'
+                : 'border-[#354456] bg-[#202D3D] text-[#A6B3C1] hover:text-white hover:bg-[#273648]'
             }`}
           >
-            {audioMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4 text-teal-400" />}
+            {audioMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
 
-          {/* Settings Nav */}
+          {/* Settings Nav Link */}
           <Link
             href="/settings"
-            title="Settings"
+            title="System Settings"
             className={`rounded-xl p-2 transition-colors border ${
-              pathname === '/settings'
-                ? 'border-teal-500/50 bg-teal-500/10 text-teal-400'
-                : 'border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white'
+              pathname.startsWith('/settings')
+                ? settings.theme === 'light' 
+                  ? 'border-[#347A53] bg-[#D4E4D0] text-[#347A53]' 
+                  : 'border-[#36B879]/50 bg-[#36B879]/10 text-[#36B879]'
+                : settings.theme === 'light'
+                ? 'border-[#DCE5D9] bg-white text-[#26382D] hover:bg-[#F5F7F0]'
+                : 'border-[#354456] bg-[#202D3D] text-[#A6B3C1] hover:text-white hover:bg-[#273648]'
             }`}
           >
             <Settings className="h-4 w-4" />
           </Link>
 
-          {/* Sign Out */}
+          {/* User Sign Out */}
           <button
             onClick={logout}
             title="Sign Out"
-            className="rounded-xl border border-slate-800 bg-slate-900 p-2 text-slate-400 hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-400 transition-colors"
+            className={`rounded-xl p-2 transition-colors border ${
+              settings.theme === 'light'
+                ? 'border-[#DCE5D9] bg-white text-[#69776C] hover:bg-rose-50 hover:border-rose-200 hover:text-rose-600'
+                : 'border-[#354456] bg-[#202D3D] text-[#A6B3C1] hover:bg-rose-500/10 hover:border-rose-500/30 hover:text-rose-400'
+            }`}
           >
             <LogOut className="h-4 w-4" />
           </button>
+
         </div>
 
       </div>

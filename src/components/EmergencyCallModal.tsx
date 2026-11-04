@@ -48,7 +48,10 @@ export const EmergencyCallModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-xl bg-slate-900 border-2 border-rose-500/80 rounded-2xl shadow-2xl overflow-hidden text-slate-100 glow-crimson">
+      <div className="w-full max-w-xl border-2 border-rose-500 rounded-2xl shadow-2xl overflow-hidden glow-crimson
+        bg-[#202D3D] text-[#E8EEF5]
+        theme-light:bg-white theme-light:text-[#26382D]
+      ">
         
         {/* Header Ribbon */}
         <div className="bg-gradient-to-r from-rose-600 to-red-700 px-6 py-4 flex items-center justify-between text-white">
