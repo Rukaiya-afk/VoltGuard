@@ -48,6 +48,8 @@ export const AdminPortal: React.FC = () => {
     userProfile
   } = useVoltStore();
 
+  const isLight = settings.theme === 'light';
+
   // Ticket Filter
   const [ticketFilter, setTicketFilter] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -614,18 +616,26 @@ export const AdminPortal: React.FC = () => {
 
       {/* TAB 6: Real-Time Field Electrician & Resident Chat */}
       {adminActiveTab === 'chat' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl flex flex-col h-[590px]">
+        <div className={`border rounded-2xl overflow-hidden shadow-sm flex flex-col h-[590px] transition-all ${
+          isLight ? 'bg-white border-[#DCE5D9]' : 'bg-slate-900 border-slate-800 shadow-xl'
+        }`}>
           {/* Channel Header & Segmented Target Selector */}
-          <div className="p-4 bg-slate-950 border-b border-slate-800 space-y-3">
+          <div className={`p-4 border-b space-y-3 ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center space-x-2">
                 <button
                   type="button"
                   onClick={() => setAdminChatTarget('electrician')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border ${
                     adminChatTarget === 'electrician'
-                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                      : 'text-slate-400 hover:text-white bg-slate-900'
+                      ? isLight
+                        ? 'bg-[#D4E4D0] text-[#1B4332] border-[#77A985] shadow-xs'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
+                      : isLight
+                        ? 'bg-white text-[#26382D] hover:bg-[#E8EFDF] border-[#DCE5D9]'
+                        : 'text-slate-400 hover:text-white bg-slate-900 border-transparent'
                   }`}
                 >
                   <Wrench className="w-3.5 h-3.5" />
@@ -635,10 +645,14 @@ export const AdminPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setAdminChatTarget('user')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 border ${
                     adminChatTarget === 'user'
-                      ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
-                      : 'text-slate-400 hover:text-white bg-slate-900'
+                      ? isLight
+                        ? 'bg-[#D4E4D0] text-[#1B4332] border-[#77A985] shadow-xs'
+                        : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40'
+                      : isLight
+                        ? 'bg-white text-[#26382D] hover:bg-[#E8EFDF] border-[#DCE5D9]'
+                        : 'text-slate-400 hover:text-white bg-slate-900 border-transparent'
                   }`}
                 >
                   <Users className="w-3.5 h-3.5" />
@@ -648,17 +662,19 @@ export const AdminPortal: React.FC = () => {
 
               {/* Real-Time Socket Connection Pill */}
               <div className="flex items-center space-x-2">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="text-[11px] font-mono text-emerald-300">
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className={`text-[11px] font-mono ${isLight ? 'text-[#14532D] font-bold' : 'text-emerald-300'}`}>
                   Socket.io Bridge Active (12ms)
                 </span>
               </div>
             </div>
 
             {/* Recipient Selector & Details */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-900">
+            <div className={`flex flex-wrap items-center justify-between gap-3 pt-2 border-t ${
+              isLight ? 'border-[#DCE5D9]' : 'border-slate-900'
+            }`}>
               <div className="flex items-center space-x-3 text-xs">
-                <span className="text-slate-400">
+                <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-slate-400'}`}>
                   {adminChatTarget === 'electrician' ? 'Active Field Technician:' : 'Resident Account:'}
                 </span>
 
@@ -666,7 +682,11 @@ export const AdminPortal: React.FC = () => {
                   <select
                     value={selectedChatElectrician}
                     onChange={(e) => setSelectedChatElectrician(e.target.value)}
-                    className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-semibold focus:outline-none focus:border-amber-400"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold focus:outline-none border shadow-xs ${
+                      isLight
+                        ? 'bg-white border-[#DCE5D9] text-[#26382D]'
+                        : 'bg-slate-900 border-slate-700 text-white focus:border-amber-400'
+                    }`}
                   >
                     {electricians.map((elec) => (
                       <option key={elec.id} value={elec.id}>
@@ -678,7 +698,11 @@ export const AdminPortal: React.FC = () => {
                   <select
                     value={selectedChatUser}
                     onChange={(e) => setSelectedChatUser(e.target.value)}
-                    className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white font-semibold focus:outline-none focus:border-indigo-400"
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold focus:outline-none border shadow-xs ${
+                      isLight
+                        ? 'bg-white border-[#DCE5D9] text-[#26382D]'
+                        : 'bg-slate-900 border-slate-700 text-white focus:border-indigo-400'
+                    }`}
                   >
                     {SEEDED_CONSUMERS.map((c) => (
                       <option key={c.id} value={c.id}>
@@ -690,8 +714,8 @@ export const AdminPortal: React.FC = () => {
               </div>
 
               {adminChatTarget === 'electrician' && (
-                <div className="text-[11px] text-slate-400 font-mono">
-                  Channel: <span className="text-amber-400 font-bold">electrician_admin</span> (Encrypted Command Uplink)
+                <div className={`text-[11px] font-mono ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
+                  Channel: <span className={`font-bold ${isLight ? 'text-[#B87A24]' : 'text-amber-400'}`}>electrician_admin</span> (Encrypted Command Uplink)
                 </div>
               )}
             </div>
@@ -699,26 +723,40 @@ export const AdminPortal: React.FC = () => {
 
           {/* Quick Clearance Chips for Electricians */}
           {adminChatTarget === 'electrician' && (
-            <div className="px-4 py-2 bg-slate-950/60 border-b border-slate-800 flex items-center space-x-2 overflow-x-auto text-[11px]">
-              <span className="text-slate-400 shrink-0 font-semibold">Quick Clearance:</span>
+            <div className={`px-4 py-2 border-b flex items-center space-x-2 overflow-x-auto text-[11px] ${
+              isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/60 border-slate-800'
+            }`}>
+              <span className={`shrink-0 font-semibold ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>Quick Clearance:</span>
               <button
                 type="button"
                 onClick={() => setAdminChatInput('Clearance Granted: Proceed with ceramic terminal lug replacement on TCK-1001.')}
-                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+                className={`px-2.5 py-1 rounded-lg border shrink-0 transition ${
+                  isLight
+                    ? 'bg-white hover:bg-[#E8EFDF] text-[#26382D] border-[#DCE5D9]'
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+                }`}
               >
                 ✅ Grant Lug Replacement
               </button>
               <button
                 type="button"
                 onClick={() => setAdminChatInput('Requesting live insulation & earth pit resistance test before re-arming breaker.')}
-                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+                className={`px-2.5 py-1 rounded-lg border shrink-0 transition ${
+                  isLight
+                    ? 'bg-white hover:bg-[#E8EFDF] text-[#26382D] border-[#DCE5D9]'
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+                }`}
               >
                 📊 Request Earth Pit Test
               </button>
               <button
                 type="button"
                 onClick={() => setAdminChatInput('Virtual Breaker reset approved. Stand clear of switchboard.')}
-                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 shrink-0 transition"
+                className={`px-2.5 py-1 rounded-lg border shrink-0 transition ${
+                  isLight
+                    ? 'bg-white hover:bg-[#E8EFDF] text-[#26382D] border-[#DCE5D9]'
+                    : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+                }`}
               >
                 ⚡ Approve Breaker Reset
               </button>
@@ -726,10 +764,14 @@ export const AdminPortal: React.FC = () => {
           )}
 
           {/* Messages Stream */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-900/60">
+          <div className={`flex-1 p-4 overflow-y-auto space-y-3 ${
+            isLight ? 'bg-[#F5F7F0]/60' : 'bg-slate-900/60'
+          }`}>
             {activeChats.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-center text-slate-500 text-xs">
-                <MessageSquare className="w-8 h-8 text-slate-600 mb-2" />
+              <div className={`flex flex-col items-center justify-center h-full text-center text-xs ${
+                isLight ? 'text-[#69776C]' : 'text-slate-500'
+              }`}>
+                <MessageSquare className={`w-8 h-8 mb-2 ${isLight ? 'text-[#77A985]' : 'text-slate-600'}`} />
                 <span>
                   {adminChatTarget === 'electrician'
                     ? 'No message history with this electrician. Send dispatch orders or technical clearances below.'
@@ -741,16 +783,24 @@ export const AdminPortal: React.FC = () => {
                 const isMe = msg.senderId === 'admin';
                 return (
                   <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                    <div className="text-[10px] text-slate-400 mb-0.5 px-1 font-mono">
+                    <div className={`text-[10px] mb-0.5 px-1 font-mono ${
+                      isLight ? 'text-[#69776C]' : 'text-slate-400'
+                    }`}>
                       {msg.senderName} • {msg.timestamp}
                     </div>
                     <div
                       className={`max-w-[80%] rounded-2xl px-4 py-2.5 text-xs ${
                         isMe
                           ? adminChatTarget === 'electrician'
-                            ? 'bg-amber-600/90 text-slate-950 font-semibold rounded-br-none shadow-sm'
-                            : 'bg-indigo-600 text-white rounded-br-none shadow-sm'
-                          : 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-bl-none shadow-sm'
+                            ? isLight 
+                              ? 'bg-[#D4E4D0] text-[#1B4332] font-semibold border border-[#77A985] rounded-br-none shadow-xs'
+                              : 'bg-amber-600/90 text-slate-950 font-semibold rounded-br-none shadow-sm'
+                            : isLight
+                              ? 'bg-[#347A53] text-white font-medium rounded-br-none shadow-xs'
+                              : 'bg-indigo-600 text-white rounded-br-none shadow-sm'
+                          : isLight
+                            ? 'bg-white text-[#26382D] border border-[#DCE5D9] rounded-bl-none shadow-xs'
+                            : 'bg-slate-800 text-slate-200 border border-slate-700/80 rounded-bl-none shadow-sm'
                       }`}
                     >
                       {msg.text}
@@ -762,7 +812,9 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           {/* Chat Input Bar */}
-          <form onSubmit={handleAdminSendChat} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center space-x-2">
+          <form onSubmit={handleAdminSendChat} className={`p-3 border-t flex items-center space-x-2 ${
+            isLight ? 'bg-white border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
             <input
               type="text"
               value={adminChatInput}
@@ -772,13 +824,19 @@ export const AdminPortal: React.FC = () => {
                   ? 'Message field technician (e.g. Clearance granted, diagnostic logs confirmed)...'
                   : 'Type official safety instructions or response to resident...'
               }
-              className="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-indigo-400"
+              className={`flex-1 px-4 py-2.5 rounded-xl text-xs focus:outline-none border ${
+                isLight 
+                  ? 'bg-[#F5F7F0] border-[#DCE5D9] text-[#26382D] placeholder-[#69776C] focus:border-[#77A985]' 
+                  : 'bg-slate-900 border-slate-800 text-white focus:border-indigo-400'
+              }`}
             />
             <button 
               type="submit" 
-              className={`p-2.5 rounded-xl shadow-md transition text-slate-950 font-bold ${
-                adminChatTarget === 'electrician'
-                  ? 'bg-amber-500 hover:bg-amber-400'
+              className={`p-2.5 rounded-xl shadow-xs transition font-bold ${
+                isLight
+                  ? 'bg-[#347A53] hover:bg-[#2A6343] text-white'
+                  : adminChatTarget === 'electrician'
+                  ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
                   : 'bg-indigo-600 hover:bg-indigo-500 text-white'
               }`}
             >
@@ -795,24 +853,40 @@ export const AdminPortal: React.FC = () => {
 
       {/* TAB 7: Admin Settings & Sensitivity Baseline */}
       {adminActiveTab === 'settings' && (
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 max-w-2xl mx-auto shadow-xl">
+        <div className={`border rounded-2xl p-6 space-y-6 max-w-2xl mx-auto transition-all ${
+          isLight ? 'bg-white border-[#DCE5D9] shadow-sm' : 'bg-slate-900 border-slate-800 shadow-xl'
+        }`}>
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-indigo-500/10 border border-indigo-500/30 rounded-xl text-indigo-400">
+            <div className={`p-3 rounded-xl border ${
+              isLight
+                ? 'bg-[#E8EFDF] border-[#DCE5D9] text-[#347A53]'
+                : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
+            }`}>
               <Sliders className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Grid Operations & Safety Sensor Thresholds</h3>
-              <p className="text-xs text-slate-400">Adjust automated breaker tripping and emergency escalation rules.</p>
+              <h3 className={`text-lg font-bold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
+                Grid Operations & Safety Sensor Thresholds
+              </h3>
+              <p className={`text-xs ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
+                Adjust automated breaker tripping and emergency escalation rules.
+              </p>
             </div>
           </div>
 
           {/* Strict Safety Mandate Warning Box (Requirement 4) */}
-          <div className="p-4 bg-amber-950/40 border-2 border-amber-500/60 rounded-xl space-y-2 text-xs">
-            <div className="flex items-center space-x-2 text-amber-400 font-extrabold">
-              <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+          <div className={`p-4 rounded-xl space-y-2 text-xs border-2 ${
+            isLight
+              ? 'bg-amber-50/90 border-amber-400/80 text-[#26382D]'
+              : 'bg-amber-950/40 border-amber-500/60'
+          }`}>
+            <div className={`flex items-center space-x-2 font-extrabold ${
+              isLight ? 'text-amber-900' : 'text-amber-400'
+            }`}>
+              <AlertTriangle className={`w-4 h-4 shrink-0 ${isLight ? 'text-amber-700' : 'text-amber-400'}`} />
               <span>STRICT SAFETY WARNING: SENSOR MUST FOLLOW A SENSITIVITY OF 75</span>
             </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">
+            <p className={`text-[11px] leading-relaxed ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>
               Under Maharashtra & Pune electrical safety regulations (IS 732 / NBC 2016), the power sensor MUST strictly follow a calibrated sensitivity threshold of <strong>75 (0.75)</strong>. 
               Altering this sensitivity risks undetected micro-arcing sparks and low-voltage cable overheating, or causes premature nuisance breaker tripping. 
               <strong>The sensor will automatically reset back to the sensitive point of 75 unless explicitly saved and authorized by the resident.</strong>
@@ -820,7 +894,11 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           {sensitivityNotice && (
-            <div className="p-3 rounded-xl bg-emerald-950/70 border border-emerald-500/50 text-emerald-300 text-xs font-semibold flex items-center space-x-2">
+            <div className={`p-3 rounded-xl border text-xs font-semibold flex items-center space-x-2 ${
+              isLight
+                ? 'bg-[#D4E4D0]/80 border-[#77A985] text-[#14532D]'
+                : 'bg-emerald-950/70 border-emerald-500/50 text-emerald-300'
+            }`}>
               <CheckCircle2 className="w-4 h-4" />
               <span>{sensitivityNotice}</span>
             </div>
@@ -828,14 +906,24 @@ export const AdminPortal: React.FC = () => {
 
           <div className="space-y-4">
             <div>
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300 mb-1">
+              <div className={`flex items-center justify-between text-xs font-semibold mb-1 ${
+                isLight ? 'text-[#26382D]' : 'text-slate-300'
+              }`}>
                 <span>Electrical Safety Sensor Sensitivity:</span>
                 <div className="flex items-center space-x-2 font-mono">
-                  <span className={`text-sm font-bold ${tempSensitivity === 0.75 ? 'text-indigo-400' : 'text-amber-400'}`}>
+                  <span className={`text-sm font-bold ${
+                    tempSensitivity === 0.75 
+                      ? isLight ? 'text-[#347A53]' : 'text-indigo-400' 
+                      : isLight ? 'text-[#B87A24]' : 'text-amber-400'
+                  }`}>
                     {tempSensitivity.toFixed(2)}
                   </span>
                   {!isSensitivitySaved && (
-                    <span className="text-[10px] text-amber-400 bg-amber-950 px-2 py-0.5 rounded border border-amber-500/40 animate-pulse font-sans">
+                    <span className={`text-[10px] px-2 py-0.5 rounded border animate-pulse font-sans font-bold ${
+                      isLight 
+                        ? 'bg-amber-100 text-amber-900 border-amber-300' 
+                        : 'text-amber-400 bg-amber-950 border-amber-500/40'
+                    }`}>
                       Unsaved (Reverts to 75)
                     </span>
                   )}
@@ -849,12 +937,16 @@ export const AdminPortal: React.FC = () => {
                 step="0.01"
                 value={tempSensitivity}
                 onChange={handleSensitivitySlider}
-                className="w-full accent-indigo-500 cursor-pointer h-2 bg-slate-950 rounded-lg"
+                className={`w-full accent-emerald-600 cursor-pointer h-2 rounded-lg ${
+                  isLight ? 'bg-[#E8EFDF]' : 'bg-slate-950'
+                }`}
               />
 
-              <div className="flex items-center justify-between text-[11px] text-slate-400 mt-1">
+              <div className={`flex items-center justify-between text-[11px] mt-1 ${
+                isLight ? 'text-[#69776C]' : 'text-slate-400'
+              }`}>
                 <span>0.50 (HighProtection)</span>
-                <span className="font-bold text-amber-400">75 (0.75 Standard Mandatory Baseline)</span>
+                <span className={`font-bold ${isLight ? 'text-[#B87A24]' : 'text-amber-400'}`}>75 (0.75 Standard Mandatory Baseline)</span>
                 <span>0.95 (HighThreshold)</span>
               </div>
 
@@ -863,7 +955,9 @@ export const AdminPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleSaveSensitivity}
-                  className="flex-1 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition flex items-center justify-center space-x-1.5"
+                  className={`flex-1 py-2.5 rounded-xl text-white font-bold text-xs shadow-sm transition flex items-center justify-center space-x-1.5 ${
+                    isLight ? 'bg-[#347A53] hover:bg-[#2A6343]' : 'bg-indigo-600 hover:bg-indigo-500 shadow-md'
+                  }`}
                 >
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Save Sensitivity (Resident Confirmation)</span>
@@ -872,7 +966,11 @@ export const AdminPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={handleResetSensitivity}
-                  className="py-2 px-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs border border-slate-700 transition"
+                  className={`py-2.5 px-3.5 rounded-xl font-semibold text-xs border transition ${
+                    isLight
+                      ? 'bg-[#F5F7F0] hover:bg-[#E8EFDF] text-[#26382D] border-[#DCE5D9]'
+                      : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                  }`}
                   title="Reset to 75 standard"
                 >
                   Reset to 75
@@ -880,23 +978,35 @@ export const AdminPortal: React.FC = () => {
               </div>
             </div>
 
-            <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div className={`p-4 rounded-xl border flex items-center justify-between ${
+              isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+            }`}>
               <div>
-                <div className="text-sm font-semibold text-white">Auto-Trip on Brownout Sag (&lt;185V sustained)</div>
-                <div className="text-xs text-slate-400">Safely disengages compressors to prevent motor burning</div>
+                <div className={`text-sm font-semibold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
+                  Auto-Trip on Brownout Sag (&lt;185V sustained)
+                </div>
+                <div className={`text-xs ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
+                  Safely disengages compressors to prevent motor burning
+                </div>
               </div>
               <input
                 type="checkbox"
                 checked={settings.autoCutoffEnabled}
                 onChange={(e) => updateSettings({ autoCutoffEnabled: e.target.checked })}
-                className="w-5 h-5 accent-indigo-500 rounded cursor-pointer"
+                className="w-5 h-5 accent-emerald-600 rounded cursor-pointer"
               />
             </div>
 
-            <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div className={`p-4 rounded-xl border flex items-center justify-between ${
+              isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+            }`}>
               <div>
-                <div className="text-sm font-semibold text-white">Automated Fire & Emergency (1921) Dispatch Gateway</div>
-                <div className="text-xs text-slate-400">Initiates emergency auto-call upon thermal runaway (&gt;65°C) to Pune Emergency</div>
+                <div className={`text-sm font-semibold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
+                  Automated Fire & Emergency (1921) Dispatch Gateway
+                </div>
+                <div className={`text-xs ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
+                  Initiates emergency auto-call upon thermal runaway (&gt;65°C) to Pune Emergency
+                </div>
               </div>
               <input
                 type="checkbox"

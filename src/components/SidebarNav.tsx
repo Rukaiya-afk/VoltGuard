@@ -536,30 +536,6 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
           })}
         </div>
 
-        {/* Live System Status Pill */}
-        {!collapsed && (
-          <div className="px-3 py-2 border-t border-inherit shrink-0">
-            <div className={`p-2.5 rounded-xl border flex items-center justify-between text-xs font-mono
-              ${globalAnomaly || safetyLatchLocked
-                ? 'bg-rose-500/10 border-rose-500/40 text-rose-400'
-                : settings.theme === 'light'
-                ? 'bg-white/80 border-[#DCE5D9] text-[#26382D]'
-                : 'bg-[#192330] border-[#354456] text-[#36B879]'
-              }
-            `}>
-              <div className="flex items-center space-x-2">
-                <span className={`h-2 w-2 rounded-full ${
-                  globalAnomaly || safetyLatchLocked ? 'bg-rose-500 animate-ping' : 'bg-[#36B879] animate-pulse'
-                }`} />
-                <span className="font-bold text-[11px]">
-                  {globalAnomaly ? 'FAULT DETECTED' : safetyLatchLocked ? 'CIRCUIT TRIPPED' : 'SYSTEM NOMINAL'}
-                </span>
-              </div>
-              <span className="text-[10px] opacity-70">230V</span>
-            </div>
-          </div>
-        )}
-
         {/* Bottom Utility Ribbon (Theme, Mute, Profile) */}
         <div className="p-2 border-t border-inherit shrink-0 space-y-1">
           <div className="flex items-center justify-between gap-1">

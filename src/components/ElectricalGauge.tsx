@@ -82,79 +82,80 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
         ? 'bg-white border-[#DCE5D9] shadow-sm' 
         : 'bg-[#202D3D] border-[#354456]'
     }`}>
-      <div className="relative w-40 h-24 overflow-hidden flex items-end justify-center">
-        <svg viewBox="0 0 180 100" className="w-full h-full overflow-visible">
+      {/* Semicircular Gauge Arc & Needle */}
+      <div className="w-44 h-24 flex items-end justify-center">
+        <svg viewBox="0 0 180 96" className="w-full h-full overflow-visible">
           {/* Background Track */}
           <path
             d={describeArc(cx, cy, r, -90, 90)}
             fill="none"
             stroke="currentColor"
-            strokeWidth="14"
+            strokeWidth="13"
             className={isLight ? 'text-[#E8EFDF]' : 'text-slate-800/40'}
             strokeLinecap="round"
           />
 
-          {/* Green Zone */}
+          {/* Green Nominal Zone */}
           <path
             d={greenArc}
             fill="none"
             stroke={isLight ? '#347A53' : '#36B879'}
-            strokeWidth="14"
-            strokeOpacity={isLight ? '0.9' : '0.85'}
+            strokeWidth="13"
+            strokeOpacity={isLight ? '0.95' : '0.85'}
             strokeLinecap="round"
           />
 
-          {/* Amber Zone */}
+          {/* Amber Warning Zone */}
           <path
             d={amberArc}
             fill="none"
             stroke={isLight ? '#B87A24' : '#E0B34E'}
-            strokeWidth="14"
-            strokeOpacity={isLight ? '0.9' : '0.85'}
+            strokeWidth="13"
+            strokeOpacity={isLight ? '0.95' : '0.85'}
           />
 
-          {/* Red Zone */}
+          {/* Red Critical Zone */}
           <path
             d={redArc}
             fill="none"
             stroke={isLight ? '#C93B46' : '#E45B63'}
-            strokeWidth="14"
-            strokeOpacity={isLight ? '0.9' : '0.85'}
+            strokeWidth="13"
+            strokeOpacity={isLight ? '0.95' : '0.85'}
             strokeLinecap="round"
           />
 
           {/* Pivot Center Point */}
-          <circle cx={cx} cy={cy} r="6" fill={isLight ? '#69776C' : '#A6B3C1'} />
+          <circle cx={cx} cy={cy} r="6" fill={isLight ? '#347A53' : '#36B879'} />
 
-          {/* Needle Line */}
+          {/* Needle Indicator Line */}
           <line
             x1={cx}
             y1={cy}
             x2={needleTip.x}
             y2={needleTip.y}
             stroke={isLight ? '#26382D' : '#FFFFFF'}
-            strokeWidth="2.5"
+            strokeWidth="3"
             strokeLinecap="round"
-            className="drop-shadow-sm transition-all duration-300"
+            className="drop-shadow-md transition-all duration-300"
           />
         </svg>
-
-        {/* Value Readout in Arc Center */}
-        <div className="absolute bottom-1 text-center select-none pointer-events-none">
-          <div className="text-lg font-extrabold font-mono tracking-tight" style={{ color: statusColor }}>
-            {value.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-            <span className="text-xs ml-0.5 font-normal opacity-80">{unit}</span>
-          </div>
-        </div>
       </div>
 
-      {/* Label under Gauge */}
-      <div className="mt-1 text-center">
-        <div className={`text-xs font-bold tracking-tight ${isLight ? 'text-[#26382D]' : 'text-[#E8EEF5]'}`}>
+      {/* High-Visibility Non-Overlapping Value Readout */}
+      <div className="mt-2 text-center select-none">
+        <div className="text-2xl font-black font-mono tracking-tight" style={{ color: statusColor }}>
+          {value.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+          <span className={`text-xs ml-1 font-bold ${isLight ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
+            {unit}
+          </span>
+        </div>
+
+        {/* Label & Operating Range */}
+        <div className={`text-xs font-bold mt-0.5 tracking-tight ${isLight ? 'text-[#26382D]' : 'text-[#E8EEF5]'}`}>
           {label}
         </div>
-        <div className={`text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
-          Range: {min}{unit} - {max}{unit}
+        <div className={`text-[10px] font-mono mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
+          Range: {min}{unit} – {max}{unit}
         </div>
       </div>
     </div>

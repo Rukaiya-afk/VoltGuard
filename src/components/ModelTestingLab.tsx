@@ -118,6 +118,7 @@ const PRESET_TEST_SCENARIOS: TestScenario[] = [
 
 export const ModelTestingLab: React.FC = () => {
   const { settings, outlets, injectFault } = useVoltStore();
+  const isLight = settings.theme === 'light';
   const cutoffThreshold = settings.anomalySensitivity || 0.75;
 
   // Test Results State
@@ -211,20 +212,34 @@ export const ModelTestingLab: React.FC = () => {
     <div className="space-y-6">
       
       {/* Lab Header Card with Model Specs */}
-      <div className="rounded-2xl border border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 p-6 shadow-xl backdrop-blur-md">
+      <div className={`rounded-2xl border p-6 transition-all ${
+        isLight
+          ? 'bg-white border-[#DCE5D9] shadow-sm'
+          : 'border-slate-800 bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/40 shadow-xl backdrop-blur-md'
+      }`}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border ${
+              isLight
+                ? 'bg-[#E8EFDF] border-[#DCE5D9] text-[#347A53]'
+                : 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400'
+            }`}>
               <Cpu className="h-6 w-6" />
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <h2 className="text-lg font-bold text-white">AI Model & Algorithm Verification Lab</h2>
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                <h2 className={`text-lg font-bold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
+                  AI Model & Algorithm Verification Lab
+                </h2>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
+                  isLight
+                    ? 'bg-[#D4E4D0] text-[#347A53] border-[#77A985]'
+                    : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
+                }`}>
                   IsolationForest v1.0
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className={`text-xs mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
                 Stress-test the Arc Fault Circuit Interrupter (AFDD), motor inrush masking, and 75% sensitivity baseline.
               </p>
             </div>
@@ -234,7 +249,9 @@ export const ModelTestingLab: React.FC = () => {
             <button
               onClick={handleRunAllTests}
               disabled={isRunningAll}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition disabled:opacity-50"
+              className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition disabled:opacity-50 text-white ${
+                isLight ? 'bg-[#347A53] hover:bg-[#2A6343]' : 'bg-indigo-600 hover:bg-indigo-500'
+              }`}
             >
               <Play className="h-3.5 w-3.5 fill-current" />
               <span>{isRunningAll ? 'Running Test Suite...' : 'Run Automated Test Suite (5/5)'}</span>
@@ -242,7 +259,11 @@ export const ModelTestingLab: React.FC = () => {
 
             <button
               onClick={handleResetTests}
-              className="flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition"
+              className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl border text-xs font-semibold transition ${
+                isLight
+                  ? 'border-[#DCE5D9] bg-[#F5F7F0] hover:bg-[#E8EFDF] text-[#26382D]'
+                  : 'border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300'
+              }`}
             >
               <RotateCcw className="h-3.5 w-3.5" />
               <span>Reset</span>
@@ -251,49 +272,65 @@ export const ModelTestingLab: React.FC = () => {
         </div>
 
         {/* Model Architecture Parameter Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-5 mt-5 border-t border-slate-800/80 text-xs">
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] uppercase text-slate-400 font-mono">Classifier</div>
-            <div className="text-xs font-bold text-white mt-0.5">Isolation Forest</div>
+        <div className={`grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-5 mt-5 border-t text-xs ${
+          isLight ? 'border-[#DCE5D9]' : 'border-slate-800/80'
+        }`}>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/70 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase font-mono ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>Classifier</div>
+            <div className={`text-xs font-bold mt-0.5 ${isLight ? 'text-[#26382D]' : 'text-white'}`}>Isolation Forest</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] uppercase text-slate-400 font-mono">Estimators</div>
-            <div className="text-xs font-bold text-indigo-300 font-mono mt-0.5">100 Trees</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/70 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase font-mono ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>Estimators</div>
+            <div className={`text-xs font-bold font-mono mt-0.5 ${isLight ? 'text-[#26382D]' : 'text-indigo-300'}`}>100 Trees</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] uppercase text-slate-400 font-mono">Input Features</div>
-            <div className="text-xs font-bold text-teal-300 font-mono mt-0.5">6 Channels (V,I,PF,dI,dt,T)</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/70 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase font-mono ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>Input Features</div>
+            <div className={`text-xs font-bold font-mono mt-0.5 ${isLight ? 'text-[#347A53]' : 'text-teal-300'}`}>6 Channels (V,I,PF,dI,dt,T)</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] uppercase text-slate-400 font-mono">Contamination (γ)</div>
-            <div className="text-xs font-bold text-amber-300 font-mono mt-0.5">0.03 (3.0%)</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/70 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase font-mono ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>Contamination (γ)</div>
+            <div className={`text-xs font-bold font-mono mt-0.5 ${isLight ? 'text-[#B87A24]' : 'text-amber-300'}`}>0.03 (3.0%)</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] uppercase text-slate-400 font-mono">Active Cutoff Point</div>
-            <div className="text-xs font-bold text-emerald-300 font-mono mt-0.5">{(cutoffThreshold * 100).toFixed(0)}% (0.75)</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/70 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase font-mono ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>Active Cutoff Point</div>
+            <div className={`text-xs font-bold font-mono mt-0.5 ${isLight ? 'text-[#347A53]' : 'text-emerald-300'}`}>{(cutoffThreshold * 100).toFixed(0)}% (0.75)</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] uppercase text-slate-400 font-mono">Mean Latency</div>
-            <div className="text-xs font-bold text-sky-300 font-mono mt-0.5">11.8 ms (Sub-Cycle)</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950/70 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase font-mono ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>Mean Latency</div>
+            <div className={`text-xs font-bold font-mono mt-0.5 ${isLight ? 'text-[#2A6F97]' : 'text-sky-300'}`}>11.8 ms (Sub-Cycle)</div>
           </div>
         </div>
       </div>
 
       {/* Test Suite Summary Pill */}
       {executedCount > 0 && (
-        <div className="flex items-center justify-between p-3.5 rounded-xl border border-slate-800 bg-slate-900 text-xs">
+        <div className={`flex items-center justify-between p-3.5 rounded-xl border text-xs ${
+          isLight ? 'bg-white border-[#DCE5D9] text-[#26382D]' : 'border-slate-800 bg-slate-900 text-white'
+        }`}>
           <div className="flex items-center space-x-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span className="font-semibold text-white">
+            <CheckCircle2 className={`h-4 w-4 ${isLight ? 'text-[#347A53]' : 'text-emerald-400'}`} />
+            <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
               Suite Execution: {passedCount}/{executedCount} Scenarios Passed Correctly ({Math.round((passedCount / executedCount) * 100)}%)
             </span>
           </div>
-          <span className="text-slate-400 font-mono text-[11px]">
+          <span className={`font-mono text-[11px] ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
             Compliant with IS 3043 / IEC 62606 Safety Standards
           </span>
         </div>
@@ -302,11 +339,11 @@ export const ModelTestingLab: React.FC = () => {
       {/* Preset Test Scenarios Grid */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-bold text-white flex items-center space-x-2">
-            <Layers className="h-4 w-4 text-indigo-400" />
+          <h3 className={`text-sm font-bold flex items-center space-x-2 ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
+            <Layers className={`h-4 w-4 ${isLight ? 'text-[#347A53]' : 'text-indigo-400'}`} />
             <span>Calibrated Electrical Fault & Transient Scenarios</span>
           </h3>
-          <span className="text-xs text-slate-400">Click &quot;Run Test&quot; to evaluate algorithm accuracy</span>
+          <span className={`text-xs ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>Click &quot;Run Test&quot; to evaluate algorithm accuracy</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -315,80 +352,92 @@ export const ModelTestingLab: React.FC = () => {
             return (
               <div 
                 key={scenario.id} 
-                className="rounded-2xl border border-slate-800 bg-slate-900 p-5 space-y-4 shadow-md hover:border-slate-700 transition"
+                className={`rounded-2xl border p-5 space-y-4 shadow-sm transition ${
+                  isLight ? 'bg-white border-[#DCE5D9]' : 'border-slate-800 bg-slate-900 hover:border-slate-700'
+                }`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h4 className="text-sm font-bold text-white">{scenario.name}</h4>
-                    <span className="text-[10px] font-mono text-slate-400 mt-0.5 block">
+                    <h4 className={`text-sm font-bold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>{scenario.name}</h4>
+                    <span className={`text-[10px] font-mono mt-0.5 block ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
                       {scenario.standardNorm}
                     </span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${
                     scenario.expectedAction === 'TRIP'
-                      ? 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
-                      : 'bg-teal-500/10 text-teal-300 border border-teal-500/30'
+                      ? isLight ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-rose-500/10 text-rose-300 border border-rose-500/30'
+                      : isLight ? 'bg-[#D4E4D0] text-[#347A53] border border-[#77A985]' : 'bg-teal-500/10 text-teal-300 border border-teal-500/30'
                   }`}>
                     {scenario.expectedAction === 'TRIP' ? 'Fault Trip' : 'Mask Inrush'}
                   </span>
                 </div>
 
-                <p className="text-xs text-slate-300 leading-relaxed">
+                <p className={`text-xs leading-relaxed ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>
                   {scenario.description}
                 </p>
 
                 {/* Input Parameters Preview */}
-                <div className="grid grid-cols-3 gap-2 text-[11px] font-mono bg-slate-950 p-2.5 rounded-xl border border-slate-800/80">
+                <div className={`grid grid-cols-3 gap-2 text-[11px] font-mono p-2.5 rounded-xl border ${
+                  isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800/80'
+                }`}>
                   <div>
-                    <span className="text-[9px] text-slate-500 block uppercase">Voltage</span>
-                    <span className="font-bold text-slate-200">{scenario.voltage} V</span>
+                    <span className={`text-[9px] block uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-500'}`}>Voltage</span>
+                    <span className={`font-bold ${isLight ? 'text-[#26382D]' : 'text-slate-200'}`}>{scenario.voltage} V</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 block uppercase">Current</span>
-                    <span className="font-bold text-amber-300">{scenario.current} A</span>
+                    <span className={`text-[9px] block uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-500'}`}>Current</span>
+                    <span className={`font-bold ${isLight ? 'text-[#B87A24]' : 'text-amber-300'}`}>{scenario.current} A</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 block uppercase">Power Factor</span>
-                    <span className="font-bold text-slate-200">{scenario.cosPhi}</span>
+                    <span className={`text-[9px] block uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-500'}`}>Power Factor</span>
+                    <span className={`font-bold ${isLight ? 'text-[#26382D]' : 'text-slate-200'}`}>{scenario.cosPhi}</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 block uppercase">Temp</span>
-                    <span className="font-bold text-slate-200">{scenario.temperature}°C</span>
+                    <span className={`text-[9px] block uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-500'}`}>Temp</span>
+                    <span className={`font-bold ${isLight ? 'text-[#26382D]' : 'text-slate-200'}`}>{scenario.temperature}°C</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 block uppercase">dI/dt</span>
-                    <span className="font-bold text-indigo-300">{scenario.dIdt} A/s</span>
+                    <span className={`text-[9px] block uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-500'}`}>dI/dt</span>
+                    <span className={`font-bold ${isLight ? 'text-[#2A6F97]' : 'text-indigo-300'}`}>{scenario.dIdt} A/s</span>
                   </div>
                   <div>
-                    <span className="text-[9px] text-slate-500 block uppercase">Duration</span>
-                    <span className="font-bold text-slate-200">{scenario.durationMs} ms</span>
+                    <span className={`text-[9px] block uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-500'}`}>Duration</span>
+                    <span className={`font-bold ${isLight ? 'text-[#26382D]' : 'text-slate-200'}`}>{scenario.durationMs} ms</span>
                   </div>
                 </div>
 
                 {/* Result Block if Executed */}
                 {res && (
                   <div className={`p-3 rounded-xl border text-xs space-y-1.5 ${
-                    res.passed 
-                      ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300' 
-                      : 'bg-rose-950/30 border-rose-500/40 text-rose-300'
+                    isLight 
+                      ? res.passed ? 'bg-[#D4E4D0]/70 border-[#77A985] text-[#14532D]' : 'bg-rose-100 border-rose-300 text-rose-900'
+                      : res.passed ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/30 border-rose-500/40 text-rose-300'
                   }`}>
                     <div className="flex items-center justify-between font-bold">
-                      <span className="flex items-center space-x-1">
+                      <span className={`flex items-center space-x-1 ${
+                        isLight ? (res.passed ? 'text-[#14532D] font-bold' : 'text-rose-900 font-bold') : ''
+                      }`}>
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         <span>{res.passed ? 'VERIFIED PASSED' : 'TOLERANCE DRIFT'}</span>
                       </span>
-                      <span className="font-mono text-[11px]">Score: {res.measuredScore.toFixed(2)}</span>
+                      <span className={`font-mono text-[11px] ${
+                        isLight ? (res.passed ? 'text-[#14532D] font-bold' : 'text-rose-900 font-bold') : ''
+                      }`}>Score: {res.measuredScore.toFixed(2)}</span>
                     </div>
-                    <div className="text-[10px] text-slate-300">{res.message}</div>
+                    <div className={`text-[10px] ${isLight ? 'text-[#26382D] font-medium' : 'text-slate-300'}`}>{res.message}</div>
                   </div>
                 )}
 
                 <button
                   type="button"
                   onClick={() => runTestScenario(scenario)}
-                  className="w-full flex items-center justify-center space-x-1.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition shadow-sm"
+                  className={`w-full flex items-center justify-center space-x-1.5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm border ${
+                    isLight
+                      ? 'bg-[#E8EFDF] hover:bg-[#D4E4D0] border-[#DCE5D9] text-[#26382D]'
+                      : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                  }`}
                 >
-                  <Play className="h-3 w-3 fill-current text-indigo-400" />
+                  <Play className={`h-3 w-3 fill-current ${isLight ? 'text-[#347A53]' : 'text-indigo-400'}`} />
                   <span>Run Scenario Test</span>
                 </button>
               </div>
@@ -398,24 +447,30 @@ export const ModelTestingLab: React.FC = () => {
       </div>
 
       {/* Interactive Live Vector Playground & Decision Boundary Analyzer */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 space-y-6 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b border-slate-800 gap-2">
+      <div className={`rounded-2xl border p-6 space-y-6 shadow-sm transition ${
+        isLight ? 'bg-white border-[#DCE5D9]' : 'border-slate-800 bg-slate-900 shadow-xl'
+      }`}>
+        <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between pb-4 border-b gap-2 ${
+          isLight ? 'border-[#DCE5D9]' : 'border-slate-800'
+        }`}>
           <div>
-            <h3 className="text-base font-bold text-white flex items-center space-x-2">
-              <Sliders className="h-5 w-5 text-indigo-400" />
+            <h3 className={`text-base font-bold flex items-center space-x-2 ${
+              isLight ? 'text-[#26382D]' : 'text-white'
+            }`}>
+              <Sliders className={`h-5 w-5 ${isLight ? 'text-[#347A53]' : 'text-indigo-400'}`} />
               <span>Interactive Decision Boundary Playground</span>
             </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className={`text-xs mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>
               Adjust multi-variable grid parameters in real time to observe the Isolation Forest risk score calculation.
             </p>
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-slate-400">Computed Anomaly Risk:</span>
+            <span className={`text-xs ${isLight ? 'text-[#69776C]' : 'text-slate-400'}`}>Computed Anomaly Risk:</span>
             <div className={`px-3 py-1 rounded-xl text-base font-extrabold font-mono border ${
               isManualAnomalous
-                ? 'bg-rose-500/10 text-rose-400 border-rose-500/40'
-                : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
+                ? isLight ? 'bg-rose-100 text-rose-800 border-rose-300' : 'bg-rose-500/10 text-rose-400 border-rose-500/40'
+                : isLight ? 'bg-[#D4E4D0] text-[#14532D] border-[#77A985]' : 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
             }`}>
               {manualScore.toFixed(2)} / 1.00
             </div>
@@ -435,8 +490,8 @@ export const ModelTestingLab: React.FC = () => {
           {/* Voltage */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-300">Line Voltage:</span>
-              <span className="font-mono font-bold text-white">{manualV.toFixed(1)} V</span>
+              <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>Line Voltage:</span>
+              <span className={`font-mono font-bold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>{manualV.toFixed(1)} V</span>
             </div>
             <input
               type="range"
@@ -445,9 +500,11 @@ export const ModelTestingLab: React.FC = () => {
               step="1"
               value={manualV}
               onChange={(e) => setManualV(parseFloat(e.target.value))}
-              className="w-full accent-indigo-400 cursor-pointer h-2 bg-slate-950 rounded-lg"
+              className={`w-full accent-emerald-600 cursor-pointer h-2 rounded-lg ${
+                isLight ? 'bg-[#E8EFDF]' : 'bg-slate-950'
+              }`}
             />
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+            <div className={`flex justify-between text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
               <span>160V (Brownout)</span>
               <span>230V Nominal</span>
               <span>260V Surge</span>
@@ -457,8 +514,8 @@ export const ModelTestingLab: React.FC = () => {
           {/* Current */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-300">Current Load (Amperes):</span>
-              <span className="font-mono font-bold text-amber-300">{manualI.toFixed(1)} A</span>
+              <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>Current Load (Amperes):</span>
+              <span className={`font-mono font-bold ${isLight ? 'text-[#B87A24]' : 'text-amber-300'}`}>{manualI.toFixed(1)} A</span>
             </div>
             <input
               type="range"
@@ -467,9 +524,11 @@ export const ModelTestingLab: React.FC = () => {
               step="0.5"
               value={manualI}
               onChange={(e) => setManualI(parseFloat(e.target.value))}
-              className="w-full accent-amber-400 cursor-pointer h-2 bg-slate-950 rounded-lg"
+              className={`w-full accent-amber-500 cursor-pointer h-2 rounded-lg ${
+                isLight ? 'bg-[#E8EFDF]' : 'bg-slate-950'
+              }`}
             />
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+            <div className={`flex justify-between text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
               <span>1A Light</span>
               <span>16A Rated Standard</span>
               <span>40A High Surge</span>
@@ -479,8 +538,8 @@ export const ModelTestingLab: React.FC = () => {
           {/* Power Factor */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-300">Power Factor (cos φ):</span>
-              <span className="font-mono font-bold text-teal-300">{manualCos.toFixed(2)}</span>
+              <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>Power Factor (cos φ):</span>
+              <span className={`font-mono font-bold ${isLight ? 'text-[#347A53]' : 'text-teal-300'}`}>{manualCos.toFixed(2)}</span>
             </div>
             <input
               type="range"
@@ -489,9 +548,11 @@ export const ModelTestingLab: React.FC = () => {
               step="0.01"
               value={manualCos}
               onChange={(e) => setManualCos(parseFloat(e.target.value))}
-              className="w-full accent-teal-400 cursor-pointer h-2 bg-slate-950 rounded-lg"
+              className={`w-full accent-teal-600 cursor-pointer h-2 rounded-lg ${
+                isLight ? 'bg-[#E8EFDF]' : 'bg-slate-950'
+              }`}
             />
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+            <div className={`flex justify-between text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
               <span>0.50 (Inductive Stall)</span>
               <span>0.88 - 0.95 Safe</span>
               <span>1.00 Pure Resistive</span>
@@ -501,8 +562,12 @@ export const ModelTestingLab: React.FC = () => {
           {/* Plug Temp */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-300">Terminal Lug Temperature:</span>
-              <span className={`font-mono font-bold ${manualT > 65 ? 'text-rose-400' : 'text-slate-100'}`}>
+              <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>Terminal Lug Temperature:</span>
+              <span className={`font-mono font-bold ${
+                manualT > 65 
+                  ? isLight ? 'text-[#C93B46]' : 'text-rose-400' 
+                  : isLight ? 'text-[#26382D]' : 'text-slate-100'
+              }`}>
                 {manualT.toFixed(1)} °C
               </span>
             </div>
@@ -513,9 +578,11 @@ export const ModelTestingLab: React.FC = () => {
               step="1"
               value={manualT}
               onChange={(e) => setManualT(parseFloat(e.target.value))}
-              className="w-full accent-rose-400 cursor-pointer h-2 bg-slate-950 rounded-lg"
+              className={`w-full accent-rose-500 cursor-pointer h-2 rounded-lg ${
+                isLight ? 'bg-[#E8EFDF]' : 'bg-slate-950'
+              }`}
             />
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+            <div className={`flex justify-between text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
               <span>25°C Ambient</span>
               <span>65°C Cutoff</span>
               <span>95°C Fire Outbreak</span>
@@ -525,8 +592,8 @@ export const ModelTestingLab: React.FC = () => {
           {/* dI/dt */}
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-semibold text-slate-300">Arc Slope (dI/dt):</span>
-              <span className="font-mono font-bold text-sky-300">{manualDIdt.toFixed(1)} A/s</span>
+              <span className={`font-semibold ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>Arc Slope (dI/dt):</span>
+              <span className={`font-mono font-bold ${isLight ? 'text-[#2A6F97]' : 'text-sky-300'}`}>{manualDIdt.toFixed(1)} A/s</span>
             </div>
             <input
               type="range"
@@ -535,9 +602,11 @@ export const ModelTestingLab: React.FC = () => {
               step="0.5"
               value={manualDIdt}
               onChange={(e) => setManualDIdt(parseFloat(e.target.value))}
-              className="w-full accent-sky-400 cursor-pointer h-2 bg-slate-950 rounded-lg"
+              className={`w-full accent-sky-600 cursor-pointer h-2 rounded-lg ${
+                isLight ? 'bg-[#E8EFDF]' : 'bg-slate-950'
+              }`}
             />
-            <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+            <div className={`flex justify-between text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
               <span>0.2 Nominal</span>
               <span>12.0 Motor Inrush</span>
               <span>35+ Micro-Arc Spike</span>
@@ -549,9 +618,13 @@ export const ModelTestingLab: React.FC = () => {
             <button
               type="button"
               onClick={() => handleInjectToActiveCircuit('master_ac')}
-              className="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white transition flex items-center justify-center space-x-1.5 shadow-md"
+              className={`w-full py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 shadow-sm border ${
+                isLight
+                  ? 'bg-[#347A53] hover:bg-[#2A6343] text-white border-[#347A53]'
+                  : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+              }`}
             >
-              <Radio className="h-3.5 w-3.5 text-indigo-400" />
+              <Radio className={`h-3.5 w-3.5 ${isLight ? 'text-white' : 'text-indigo-400'}`} />
               <span>Apply Test Vector to Master AC</span>
             </button>
           </div>
@@ -560,13 +633,15 @@ export const ModelTestingLab: React.FC = () => {
         {/* Visual Threshold Bar */}
         <div className="space-y-2 pt-2">
           <div className="flex justify-between text-xs">
-            <span className="text-slate-400">Isolation Forest Risk Spectrum vs. 75% Regulatory Threshold:</span>
-            <span className="font-mono text-slate-300">
-              Cutoff Baseline: <strong className="text-amber-400">0.75</strong>
+            <span className={isLight ? 'text-[#69776C]' : 'text-slate-400'}>Isolation Forest Risk Spectrum vs. 75% Regulatory Threshold:</span>
+            <span className={`font-mono ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>
+              Cutoff Baseline: <strong className={isLight ? 'text-[#B87A24]' : 'text-amber-400'}>0.75</strong>
             </span>
           </div>
 
-          <div className="relative h-4 w-full rounded-full bg-slate-950 border border-slate-800 overflow-hidden">
+          <div className={`relative h-4 w-full rounded-full border overflow-hidden ${
+            isLight ? 'bg-[#E8EFDF] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
             {/* Safe Zone */}
             <div 
               className="absolute left-0 top-0 bottom-0 bg-emerald-500/40"
@@ -589,47 +664,89 @@ export const ModelTestingLab: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 pt-1">
-            <span className="text-emerald-400">0.00 Safe Operation</span>
-            <span className="text-amber-300 font-bold">▲ 0.75 Mandatory Baseline</span>
-            <span className="text-rose-400">1.00 Sub-Cycle Emergency Trip</span>
+          <div className={`flex items-center justify-between text-[11px] font-mono pt-1 ${
+            isLight ? 'text-[#69776C]' : 'text-slate-400'
+          }`}>
+            <span className={isLight ? 'text-[#14532D] font-bold' : 'text-emerald-400'}>0.00 Safe Operation</span>
+            <span className={isLight ? 'text-[#B87A24] font-bold' : 'text-amber-300 font-bold'}>▲ 0.75 Mandatory Baseline</span>
+            <span className={isLight ? 'text-[#C93B46] font-bold' : 'text-rose-400'}>1.00 Sub-Cycle Emergency Trip</span>
           </div>
         </div>
       </div>
 
       {/* Model Benchmark & Confusion Matrix Card */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+      <div className={`rounded-2xl border p-6 space-y-4 shadow-sm transition ${
+        isLight ? 'bg-white border-[#DCE5D9]' : 'border-slate-800 bg-slate-900 shadow-xl'
+      }`}>
+        <div className={`flex items-center justify-between pb-3 border-b ${
+          isLight ? 'border-[#DCE5D9]' : 'border-slate-800'
+        }`}>
           <div className="flex items-center space-x-2">
-            <BarChart3 className="h-5 w-5 text-indigo-400" />
-            <h3 className="text-sm font-bold text-white">Historical Evaluation Benchmark (12,500 Monitored Grid Cycles)</h3>
+            <BarChart3 className={`h-5 w-5 ${isLight ? 'text-[#347A53]' : 'text-indigo-400'}`} />
+            <h3 className={`text-sm font-bold ${isLight ? 'text-[#26382D]' : 'text-white'}`}>
+              Historical Evaluation Benchmark (12,500 Monitored Grid Cycles)
+            </h3>
           </div>
-          <span className="text-xs text-emerald-400 font-mono font-bold">Overall Accuracy: 99.82%</span>
+          <span className={`text-xs font-mono font-bold ${isLight ? 'text-[#347A53]' : 'text-emerald-400'}`}>
+            Overall Accuracy: 99.82%
+          </span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-            <div className="text-[10px] text-slate-400 uppercase">True Positive (Arc Faults Caught)</div>
-            <div className="text-base font-bold text-emerald-400 mt-1">1,482 / 1,482</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">100% Sensitivity</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>
+              True Positive (Arc Faults Caught)
+            </div>
+            <div className={`text-base font-bold mt-1 ${isLight ? 'text-[#347A53]' : 'text-emerald-400'}`}>
+              1,482 / 1,482
+            </div>
+            <div className={`text-[10px] mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
+              100% Sensitivity
+            </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-            <div className="text-[10px] text-slate-400 uppercase">True Negative (Inrushes Masked)</div>
-            <div className="text-base font-bold text-emerald-400 mt-1">11,011 / 11,018</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">99.94% Specificity</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>
+              True Negative (Inrushes Masked)
+            </div>
+            <div className={`text-base font-bold mt-1 ${isLight ? 'text-[#347A53]' : 'text-emerald-400'}`}>
+              11,011 / 11,018
+            </div>
+            <div className={`text-[10px] mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
+              99.94% Specificity
+            </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-            <div className="text-[10px] text-slate-400 uppercase">False Positives (Nuisance Trips)</div>
-            <div className="text-base font-bold text-slate-300 mt-1">7 Instances</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">FPR: 0.06% (Industry Norm &lt; 0.2%)</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>
+              False Positives (Nuisance Trips)
+            </div>
+            <div className={`text-base font-bold mt-1 ${isLight ? 'text-[#26382D]' : 'text-slate-300'}`}>
+              7 Instances
+            </div>
+            <div className={`text-[10px] mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
+              FPR: 0.06% (Industry Norm &lt; 0.2%)
+            </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-            <div className="text-[10px] text-slate-400 uppercase">False Negatives (Missed Hazards)</div>
-            <div className="text-base font-bold text-emerald-400 mt-1">0 Instances</div>
-            <div className="text-[10px] text-slate-500 mt-0.5">Zero Safety Breaches Recorded</div>
+          <div className={`p-3 rounded-xl border ${
+            isLight ? 'bg-[#F5F7F0] border-[#DCE5D9]' : 'bg-slate-950 border-slate-800'
+          }`}>
+            <div className={`text-[10px] uppercase ${isLight ? 'text-[#69776C] font-semibold' : 'text-slate-400'}`}>
+              False Negatives (Missed Hazards)
+            </div>
+            <div className={`text-base font-bold mt-1 ${isLight ? 'text-[#347A53]' : 'text-emerald-400'}`}>
+              0 Instances
+            </div>
+            <div className={`text-[10px] mt-0.5 ${isLight ? 'text-[#69776C]' : 'text-slate-500'}`}>
+              Zero Safety Breaches Recorded
+            </div>
           </div>
         </div>
       </div>
