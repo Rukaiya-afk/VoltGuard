@@ -67,6 +67,14 @@ export const AuthPortal: React.FC = () => {
     // Unlock Web Audio API context during user click gesture
     audioController.resumeContext().catch(() => {});
 
+    // If logging into spiked account, initiate alarm sound immediately in this click gesture
+    const isSpikedUser = identifier.trim().toLowerCase().includes('karan') || identifier.trim().toLowerCase().includes('spike');
+    if (isSpikedUser && selectedRole === 'user') {
+      const customDataUrl = typeof window !== 'undefined' ? localStorage.getItem('voltguard_custom_audio') || undefined : undefined;
+      const settings = useVoltStore.getState().settings;
+      audioController.playAlarm(settings.alarmTone || 'buzzer', settings.alarmVolume || 0.85, customDataUrl);
+    }
+
     const success = loginWithCredentials(identifier, selectedRole);
     if (success) {
       setLoginSuccess(true);
@@ -317,6 +325,7 @@ export const AuthPortal: React.FC = () => {
                   onClick={() => {
                     setIdentifier('karan.malhotra@gmail.com');
                     setPassword('password123');
+                    audioController.resumeContext().catch(() => {});
                   }}
                   className="w-full flex justify-between items-center bg-rose-950/40 border border-rose-500/40 hover:bg-rose-950/60 p-1.5 rounded-lg text-left transition"
                 >

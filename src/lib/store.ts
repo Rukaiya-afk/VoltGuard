@@ -1142,10 +1142,64 @@ export const useVoltStore = create<VoltGuardState>()(
           history.shift();
         }
 
+        const currentOutlets = get().outlets;
+        const mergedOutlets = { ...frame.outlets };
+
+        // Preserve and dynamically simulate spiked_heater if user is Karan Malhotra (user-spiked)
+        let isSpikedHazardActive = false;
+        if (get().userProfile.id === 'user-spiked') {
+          const prevSpiked = currentOutlets.spiked_heater || {
+            id: 'spiked_heater',
+            name: 'Kitchen Heavy Geyser (25A High Surge)',
+            modelNumber: 'Racold Pronto 25A Coil',
+            location: 'Kitchen Utility',
+            rated_current: 16.0,
+            trip_current: 25.0,
+            voltage: 182.0,
+            current: 38.4,
+            cos_phi: 0.62,
+            power_watts: 4330.0,
+            terminal_temp: 84.5,
+            status: 'anomalous',
+            breaker_state: 'CLOSED',
+            fault_mode: 'stall',
+            anomaly_score: 0.98,
+            isUserCreated: false,
+            iotStatus: 'CONNECTED',
+          };
+
+          if (prevSpiked.breaker_state === 'CLOSED') {
+            isSpikedHazardActive = true;
+            mergedOutlets.spiked_heater = {
+              ...prevSpiked,
+              voltage: Math.round((182.0 + (Math.random() * 2 - 1)) * 10) / 10,
+              current: Math.round((38.4 + (Math.random() * 0.4 - 0.2)) * 10) / 10,
+              terminal_temp: Math.min(92.0, Math.round((prevSpiked.terminal_temp + 0.1) * 10) / 10),
+              status: 'anomalous',
+              anomaly_score: 0.98,
+            };
+          } else {
+            mergedOutlets.spiked_heater = {
+              ...prevSpiked,
+              current: 0.0,
+              power_watts: 0.0,
+              status: 'tripped',
+              anomaly_score: 0.0,
+            };
+          }
+        }
+
+        // Determine if any closed breaker is anomalous
+        const hasAnomalousOutlets = Object.values(mergedOutlets).some(
+          (o) => (o.status === 'anomalous' || o.status === 'outbreak') && o.breaker_state === 'CLOSED'
+        );
+
+        const isGlobalAnomalous = frame.global_anomaly || isSpikedHazardActive || hasAnomalousOutlets || !!get().forensicAlert;
+
         const updates: Partial<VoltGuardState> = {
-          outlets: frame.outlets,
+          outlets: mergedOutlets,
           history,
-          globalAnomaly: frame.global_anomaly,
+          globalAnomaly: isGlobalAnomalous,
         };
 
         if (frame.forensic_alert) {
