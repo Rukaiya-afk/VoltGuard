@@ -684,8 +684,9 @@ export const useVoltStore = create<VoltGuardState>()(
       loginAsUser: (userId: string) => {
         const found = SEEDED_CONSUMERS.find((c) => c.id === userId) || SEEDED_CONSUMERS[0];
         if (userId === 'user-spiked') {
+          const { kitchen_geyser, ...baseOutlets } = defaultOutlets;
           const spikedOutlets: Record<string, OutletData> = {
-            ...defaultOutlets,
+            ...baseOutlets,
             spiked_heater: {
               id: 'spiked_heater',
               name: 'Kitchen Heavy Geyser (25A High Surge)',
@@ -1148,6 +1149,7 @@ export const useVoltStore = create<VoltGuardState>()(
         // Preserve and dynamically simulate spiked_heater if user is Karan Malhotra (user-spiked)
         let isSpikedHazardActive = false;
         if (get().userProfile.id === 'user-spiked') {
+          delete mergedOutlets.kitchen_geyser;
           const prevSpiked = currentOutlets.spiked_heater || {
             id: 'spiked_heater',
             name: 'Kitchen Heavy Geyser (25A High Surge)',

@@ -29,7 +29,9 @@ import {
   ShieldAlert,
   Sliders,
   TrendingUp,
-  Cpu
+  Cpu,
+  Power,
+  AlertTriangle
 } from 'lucide-react';
 import { useVoltStore } from '@/lib/store';
 import { SwitchboardTab } from '@/components/SwitchboardTab';
@@ -52,6 +54,7 @@ export const UserPortal: React.FC = () => {
     triggerFireEmergencyProtocol,
     globalAnomaly,
     safetyLatchLocked,
+    toggleBreaker,
     settings
   } = useVoltStore();
 
@@ -83,12 +86,20 @@ export const UserPortal: React.FC = () => {
 
   // Derived real-time electrical metrics (Section 8: Main Dashboard Visual Hierarchy)
   const outletList = Object.values(outlets);
+  // Detect any anomalous or overloaded active circuit
+  const anomalousOutlet = outletList.find(
+    (o) => (o.status === 'anomalous' || o.status === 'outbreak' || o.current > o.trip_current || o.terminal_temp > 75) && o.breaker_state === 'CLOSED'
+  );
   const activeCircuitsCount = outletList.filter(o => o.breaker_state === 'CLOSED').length;
   const totalCircuitsCount = outletList.length;
   const totalPowerWatts = outletList.filter(o => o.breaker_state === 'CLOSED').reduce((acc, o) => acc + o.power_watts, 0);
-  const mainsVoltage = outletList[0]?.voltage || 230.0;
+  
+  // Mains voltage reflects the worst line voltage if there is a sag or anomaly; otherwise line 1
+  const mainsVoltage = anomalousOutlet ? anomalousOutlet.voltage : (outletList[0]?.voltage || 230.0);
   const peakTemperature = Math.max(...outletList.map(o => o.terminal_temp), 32.0);
-  const hasCriticalAnomaly = globalAnomaly || outletList.some(o => o.status === 'anomalous' || o.breaker_state === 'TRIPPED');
+  const hasCriticalAnomaly = globalAnomaly || Boolean(anomalousOutlet) || outletList.some(o => o.status === 'anomalous' || o.breaker_state === 'TRIPPED');
+  const isPowerOverload = totalPowerWatts > 6500;
+  const isVoltageSag = mainsVoltage < 207;
 
   const handleBookSlot = (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,68 +253,68 @@ export const UserPortal: React.FC = () => {
             
             {/* Metric 1: Total Power Draw */}
             <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
-              settings.theme === 'light' 
-                ? 'bg-white border-[#DCE5D9] text-[#26382D]' 
-                : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
+              isPowerOverload
+                ? settings.theme === 'light' ? 'bg-rose-50 border-rose-300 text-rose-900 ring-2 ring-rose-300/60' : 'bg-rose-500/10 border-rose-500/60 text-rose-200 ring-2 ring-rose-500/30'
+                : settings.theme === 'light' ? 'bg-white border-[#DCE5D9] text-[#26382D]' : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
             }`}>
               <div className="flex items-center justify-between">
                 <span className={`text-[11px] font-bold uppercase tracking-wider ${
-                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                  isPowerOverload ? 'text-rose-600 font-extrabold' : (settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]')
                 }`}>
                   Total Power Draw
                 </span>
                 <div className={`p-1.5 rounded-lg ${
-                  settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#347A53]' : 'bg-[#36B879]/10 text-[#36B879]'
+                  isPowerOverload ? 'bg-rose-600 text-white animate-pulse' : (settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#347A53]' : 'bg-[#36B879]/10 text-[#36B879]')
                 }`}>
                   <Zap className="h-4 w-4" />
                 </div>
               </div>
               <div className={`mt-2 text-2xl font-black font-mono tracking-tight ${
-                settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'
+                isPowerOverload ? 'text-rose-500' : (settings.theme === 'light' ? 'text-[#26382D]' : 'text-white')
               }`}>
                 {Math.round(totalPowerWatts).toLocaleString()}
                 <span className={`text-xs font-semibold ml-1 ${
-                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                  isPowerOverload ? 'text-rose-400' : (settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]')
                 }`}>W</span>
               </div>
               <div className={`mt-1 text-[11px] flex items-center space-x-1 font-semibold ${
-                settings.theme === 'light' ? 'text-[#347A53]' : 'text-[#36B879]'
+                isPowerOverload ? 'text-rose-600 animate-pulse' : (settings.theme === 'light' ? 'text-[#347A53]' : 'text-[#36B879]')
               }`}>
-                <TrendingUp className="h-3 w-3" />
-                <span>Aggregate Home Load</span>
+                {isPowerOverload ? <AlertTriangle className="h-3 w-3 text-rose-600" /> : <TrendingUp className="h-3 w-3" />}
+                <span>{isPowerOverload ? 'CRITICAL OVERLOAD (>6.5kW)' : 'Aggregate Home Load'}</span>
               </div>
             </div>
 
             {/* Metric 2: Mains Line Voltage */}
             <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
-              settings.theme === 'light' 
-                ? 'bg-white border-[#DCE5D9] text-[#26382D]' 
-                : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
+              isVoltageSag
+                ? settings.theme === 'light' ? 'bg-rose-50 border-rose-300 text-rose-900 ring-2 ring-rose-300/60' : 'bg-rose-500/10 border-rose-500/60 text-rose-200 ring-2 ring-rose-500/30'
+                : settings.theme === 'light' ? 'bg-white border-[#DCE5D9] text-[#26382D]' : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
             }`}>
               <div className="flex items-center justify-between">
                 <span className={`text-[11px] font-bold uppercase tracking-wider ${
-                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                  isVoltageSag ? 'text-rose-600 font-extrabold' : (settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]')
                 }`}>
                   Mains Voltage
                 </span>
                 <div className={`p-1.5 rounded-lg ${
-                  settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#2A6F97]' : 'bg-[#4B91D9]/10 text-[#4B91D9]'
+                  isVoltageSag ? 'bg-rose-600 text-white animate-pulse' : (settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#2A6F97]' : 'bg-[#4B91D9]/10 text-[#4B91D9]')
                 }`}>
                   <Activity className="h-4 w-4" />
                 </div>
               </div>
               <div className={`mt-2 text-2xl font-black font-mono tracking-tight ${
-                settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'
+                isVoltageSag ? 'text-rose-500' : (settings.theme === 'light' ? 'text-[#26382D]' : 'text-white')
               }`}>
                 {mainsVoltage.toFixed(1)}
                 <span className={`text-xs font-semibold ml-1 ${
-                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                  isVoltageSag ? 'text-rose-400' : (settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]')
                 }`}>V</span>
               </div>
               <div className={`mt-1 text-[11px] flex items-center space-x-1 ${
-                settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                isVoltageSag ? 'text-rose-600 font-bold' : (settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]')
               }`}>
-                <span>Grid Standard: 230V AC</span>
+                <span>{isVoltageSag ? `⚠️ MAINS BROWNOUT SAG (<207V)` : 'Grid Standard: 230V AC'}</span>
               </div>
             </div>
 
@@ -382,18 +393,20 @@ export const UserPortal: React.FC = () => {
               min={160}
               max={280}
               unit="V"
-              label="Mains Line 1 Voltage (L1)"
+              label={anomalousOutlet ? `Mains Voltage Sag (${anomalousOutlet.name.split(' ')[0]})` : "Mains Line 1 Voltage (L1)"}
               warnThreshold={185}
               critThreshold={250}
+              gaugeType="voltage"
             />
             <ElectricalGauge
               value={totalPowerWatts}
               min={0}
-              max={6000}
+              max={Math.max(16000, Math.ceil(totalPowerWatts / 2000) * 2000)}
               unit="W"
               label="Household Power Demand (Total Watts)"
-              warnThreshold={3800}
-              critThreshold={5000}
+              warnThreshold={6500}
+              critThreshold={10000}
+              gaugeType="standard"
             />
           </div>
 
@@ -460,43 +473,148 @@ export const UserPortal: React.FC = () => {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
               {outletList.map((outlet) => {
                 const isTripped = outlet.breaker_state === 'TRIPPED';
+                const isSpikedHazard = !isTripped && (
+                  outlet.status === 'anomalous' || 
+                  outlet.status === 'outbreak' || 
+                  outlet.current > outlet.trip_current || 
+                  outlet.terminal_temp > 75 ||
+                  outlet.anomaly_score > 0.70
+                );
+                const isHighLoad = !isTripped && !isSpikedHazard && (outlet.current > outlet.trip_current * 0.85);
+
                 return (
                   <div
                     key={outlet.id}
-                    className={`p-3.5 rounded-xl border transition-all ${
-                      isTripped
+                    className={`p-4 rounded-xl border transition-all flex flex-col justify-between ${
+                      isSpikedHazard
                         ? settings.theme === 'light'
-                          ? 'bg-rose-50 border-rose-300'
-                          : 'bg-rose-950/20 border-rose-500/50'
+                          ? 'bg-rose-50/90 border-rose-500 ring-2 ring-rose-400/50 shadow-md'
+                          : 'bg-rose-950/30 border-rose-500 ring-2 ring-rose-500/50 shadow-lg'
+                        : isTripped
+                        ? settings.theme === 'light'
+                          ? 'bg-slate-100 border-slate-300 opacity-80'
+                          : 'bg-[#151D28] border-slate-700 opacity-80'
+                        : isHighLoad
+                        ? settings.theme === 'light'
+                          ? 'bg-amber-50 border-amber-300'
+                          : 'bg-amber-950/20 border-amber-500/40'
                         : settings.theme === 'light'
                         ? 'bg-[#F5F7F0] border-[#DCE5D9]'
                         : 'bg-[#192330] border-[#354456]'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className={`text-xs font-bold truncate ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>
-                        {outlet.name}
-                      </span>
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        isTripped
-                          ? 'bg-rose-500/20 text-rose-500 border border-rose-500/30'
-                          : settings.theme === 'light'
-                          ? 'bg-[#D4E4D0] text-[#347A53] border border-[#77A985]'
-                          : 'bg-[#36B879]/20 text-[#36B879] border border-[#36B879]/40'
-                      }`}>
-                        {isTripped ? 'TRIPPED' : 'NORMAL'}
-                      </span>
+                    <div>
+                      {/* Circuit Header & Status Badge */}
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="truncate">
+                          <span className={`text-xs font-bold block truncate ${
+                            isSpikedHazard
+                              ? 'text-rose-600 font-extrabold'
+                              : settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'
+                          }`}>
+                            {outlet.name}
+                          </span>
+                          <span className={`text-[10px] font-mono ${settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
+                            Trip Limit: {outlet.trip_current}A Rated
+                          </span>
+                        </div>
+
+                        <div>
+                          {isSpikedHazard ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-600 text-white border border-rose-500 animate-pulse flex items-center space-x-1 shadow-sm">
+                              <Flame className="w-3 h-3" />
+                              <span>CRITICAL SPIKE</span>
+                            </span>
+                          ) : isTripped ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/20 text-slate-400 border border-slate-500/40">
+                              TRIPPED / SAFE
+                            </span>
+                          ) : isHighLoad ? (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-500 border border-amber-500/40">
+                              HIGH LOAD
+                            </span>
+                          ) : (
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              settings.theme === 'light'
+                                ? 'bg-[#D4E4D0] text-[#347A53] border border-[#77A985]'
+                                : 'bg-[#36B879]/20 text-[#36B879] border border-[#36B879]/40'
+                            }`}>
+                              NORMAL
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Voltage & Current */}
+                      <div className="mt-3 flex items-center justify-between text-xs font-mono">
+                        <span className={`font-semibold ${
+                          isSpikedHazard ? 'text-rose-600 font-bold' : (settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]')
+                        }`}>
+                          {outlet.voltage}V • {outlet.current}A
+                        </span>
+                        <span className={`font-bold ${
+                          isSpikedHazard ? 'text-rose-600' : (settings.theme === 'light' ? 'text-[#26382D]' : 'text-white')
+                        }`}>
+                          {outlet.power_watts}W
+                        </span>
+                      </div>
+
+                      {/* Lug Temperature */}
+                      <div className="mt-1 text-[11px] font-mono flex items-center justify-between">
+                        <span className={settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}>
+                          Terminal Lug:
+                        </span>
+                        <span className={`font-bold ${
+                          outlet.terminal_temp > 75 
+                            ? 'text-rose-500 font-extrabold animate-pulse' 
+                            : (settings.theme === 'light' ? 'text-[#26382D]' : 'text-white')
+                        }`}>
+                          {outlet.terminal_temp.toFixed(1)}°C
+                        </span>
+                      </div>
                     </div>
-                    <div className="mt-2 flex items-center justify-between text-xs font-mono">
-                      <span className={settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}>
-                        {outlet.voltage}V • {outlet.current}A
-                      </span>
-                      <span className={`font-bold ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>
-                        {outlet.power_watts}W
-                      </span>
+
+                    {/* Circuit Action / Trip Breaker Button */}
+                    <div className="mt-3 pt-2.5 border-t border-inherit">
+                      {isSpikedHazard ? (
+                        <button
+                          onClick={() => toggleBreaker(outlet.id, 'TRIPPED')}
+                          className="w-full py-2 px-3 rounded-xl text-xs font-black bg-rose-600 hover:bg-rose-700 text-white flex items-center justify-center space-x-1.5 shadow-md shadow-rose-900/40 transition-all active:scale-[0.98] animate-pulse cursor-pointer"
+                          title="Trip this breaker to isolate hazard and silence alarm"
+                        >
+                          <Zap className="w-3.5 h-3.5" />
+                          <span>⚡ TRIP BREAKER (EMERGENCY CUT)</span>
+                        </button>
+                      ) : isTripped ? (
+                        <button
+                          onClick={() => toggleBreaker(outlet.id, 'CLOSED')}
+                          disabled={safetyLatchLocked}
+                          className={`w-full py-1.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center space-x-1.5 border transition-all ${
+                            safetyLatchLocked
+                              ? 'bg-slate-800/40 text-slate-500 border-slate-700 cursor-not-allowed'
+                              : 'bg-[#36B879]/15 text-[#36B879] border-[#36B879]/40 hover:bg-[#36B879]/25 cursor-pointer'
+                          }`}
+                        >
+                          <Power className="w-3.5 h-3.5" />
+                          <span>{safetyLatchLocked ? 'LOCKED BY SAFETY LATCH' : 'Restore Circuit Breaker'}</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => toggleBreaker(outlet.id, 'TRIPPED')}
+                          className={`w-full py-1 px-2 rounded-lg text-[11px] font-semibold flex items-center justify-center space-x-1 border opacity-70 hover:opacity-100 transition-all cursor-pointer ${
+                            settings.theme === 'light'
+                              ? 'bg-white border-[#DCE5D9] text-[#69776C] hover:text-rose-600 hover:border-rose-300'
+                              : 'bg-[#192330] border-[#354456] text-[#A6B3C1] hover:text-rose-400 hover:border-rose-500/40'
+                          }`}
+                          title="Simulate manual breaker trip"
+                        >
+                          <Power className="w-3 h-3" />
+                          <span>Trip Breaker</span>
+                        </button>
+                      )}
                     </div>
                   </div>
                 );

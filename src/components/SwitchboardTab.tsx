@@ -76,8 +76,9 @@ export const SwitchboardTab: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {Object.values(outlets).map((outlet) => {
           const isTripped = outlet.breaker_state === 'TRIPPED';
-          const isAnomalous = outlet.status === 'anomalous';
+          const isAnomalous = outlet.status === 'anomalous' || outlet.status === 'outbreak';
           const isInrush = outlet.status === 'inrush';
+          const isSpikedHazard = !isTripped && (isAnomalous || outlet.current > outlet.trip_current || outlet.terminal_temp > 75 || outlet.anomaly_score > 0.70);
           const isEvHazard = outlet.id === 'ev_charger' && (isAnomalous || outlet.terminal_temp > 60 || outlet.anomaly_score > 0.6);
 
           // Calculate load percentage of rated capacity
@@ -87,7 +88,9 @@ export const SwitchboardTab: React.FC = () => {
             <div
               key={outlet.id}
               className={`rounded-2xl border p-5 transition-all relative space-y-4 shadow-sm flex flex-col justify-between ${
-                isTripped
+                isSpikedHazard
+                  ? 'border-rose-500 bg-rose-950/30 ring-2 ring-rose-500/50 shadow-lg glow-crimson theme-light:bg-rose-50/90 theme-light:border-rose-400'
+                  : isTripped
                   ? 'border-rose-500/80 bg-rose-950/20 theme-light:bg-rose-50/70 theme-light:border-rose-300'
                   : isEvHazard || isAnomalous
                   ? 'border-amber-500 bg-amber-950/20 theme-light:bg-amber-50/70 theme-light:border-amber-300 glow-crimson'
@@ -109,7 +112,12 @@ export const SwitchboardTab: React.FC = () => {
                   </div>
 
                   <div>
-                    {isTripped ? (
+                    {isSpikedHazard ? (
+                      <span className="inline-flex items-center space-x-1 rounded-full px-2.5 py-0.5 text-xs font-black bg-rose-600 text-white animate-pulse shadow-sm">
+                        <Flame className="h-3.5 w-3.5" />
+                        <span>🔥 CRITICAL OVERLOAD</span>
+                      </span>
+                    ) : isTripped ? (
                       <span className="inline-flex items-center space-x-1 rounded-full px-2.5 py-0.5 text-xs font-bold bg-rose-500/20 border border-rose-500/40 text-rose-400 theme-light:bg-rose-100 theme-light:text-rose-700 theme-light:border-rose-300 animate-pulse">
                         <Flame className="h-3.5 w-3.5" />
                         <span>TRIPPED</span>
@@ -242,11 +250,19 @@ export const SwitchboardTab: React.FC = () => {
                       ? safetyLatchLocked
                         ? 'bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed theme-light:bg-slate-200 theme-light:text-slate-400'
                         : 'bg-[#36B879] text-[#111820] hover:bg-[#2fa068] theme-light:bg-[#347A53] theme-light:text-white'
+                      : isSpikedHazard
+                      ? 'bg-rose-600 hover:bg-rose-500 text-white font-black animate-pulse shadow-md shadow-rose-900/40'
                       : 'bg-rose-500/15 text-rose-300 border border-rose-500/40 hover:bg-rose-500/25 theme-light:bg-rose-50 theme-light:text-rose-700 theme-light:border-rose-300'
                   }`}
                 >
                   <Power className="h-4 w-4" />
-                  <span>{isTripped ? (safetyLatchLocked ? 'LOCKED BY SAFETY LATCH' : 'Restore Circuit Breaker') : 'Open Breaker / Cut Power'}</span>
+                  <span>
+                    {isTripped
+                      ? (safetyLatchLocked ? 'LOCKED BY SAFETY LATCH' : 'Restore Circuit Breaker')
+                      : isSpikedHazard
+                      ? '⚡ TRIP BREAKER (EMERGENCY CUT)'
+                      : 'Open Breaker / Cut Power'}
+                  </span>
                 </button>
 
                 <div className="flex items-center space-x-1.5 text-[11px]">
