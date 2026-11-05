@@ -712,6 +712,7 @@ export const useVoltStore = create<VoltGuardState>()(
             userProfile: found,
             outlets: spikedOutlets,
             globalAnomaly: true,
+            audioMuted: false, // Ensure audio alarm starts sounding immediately upon spiked hazard login
             spikedHazardNotice: {
               hazard: '🔥 CRITICAL CURRENT SPIKE DETECTED: Kitchen Heavy Geyser current surged to 38.4A (Rating 16A exceeded by 240%) at 84.5°C under 182V low-voltage stall. Severe electrical arc breakdown detected!',
               immediateFix: 'Immediate Fix: Trip circuit breaker directly via the app below to cut the live circuit and silence the alarm. Do not touch heating appliance. Certified electrician inspection required.',

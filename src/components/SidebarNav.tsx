@@ -566,9 +566,11 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
             <button
               onClick={toggleAudioMute}
               title={audioMuted ? 'Unmute Alarms' : 'Mute Alarms'}
-              className={`flex items-center justify-center h-8 flex-1 rounded-lg border transition-colors
+              className={`flex items-center justify-center h-8 flex-1 rounded-lg border transition-all
                 ${audioMuted
                   ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
+                  : globalAnomaly
+                  ? 'border-rose-500 bg-rose-500/20 text-rose-600 dark:text-rose-400 animate-pulse ring-2 ring-rose-500/40'
                   : settings.theme === 'light'
                   ? 'border-[#DCE5D9] bg-white text-[#347A53] hover:bg-[#F5F7F0]'
                   : 'border-[#354456] bg-[#202D3D] text-[#36B879] hover:text-white'
@@ -578,7 +580,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
               {audioMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
               {!collapsed && (
                 <span className="ml-1.5 text-[10px] font-bold">
-                  {audioMuted ? 'MUTED' : 'SOUND'}
+                  {audioMuted ? 'MUTED' : globalAnomaly ? 'ALARM' : 'SOUND'}
                 </span>
               )}
             </button>

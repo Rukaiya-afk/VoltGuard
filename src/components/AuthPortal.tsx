@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { useVoltStore } from '@/lib/store';
 import { UserRole } from '@/lib/types';
+import { audioController } from '@/lib/audioController';
 
 export const AuthPortal: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<UserRole>('user');
@@ -62,6 +63,9 @@ export const AuthPortal: React.FC = () => {
       setErrorMsg('Please enter your login email/ID and password.');
       return;
     }
+
+    // Unlock Web Audio API context during user click gesture
+    audioController.resumeContext().catch(() => {});
 
     const success = loginWithCredentials(identifier, selectedRole);
     if (success) {

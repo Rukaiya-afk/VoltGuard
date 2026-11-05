@@ -187,6 +187,9 @@ export default function DashboardPage() {
     } else {
       audioController.stopSound();
     }
+    return () => {
+      audioController.stopSound();
+    };
   }, [globalAnomaly, audioMuted, settings.alarmTone, settings.alarmVolume]);
 
   useEffect(() => {

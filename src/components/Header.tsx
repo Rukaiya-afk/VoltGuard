@@ -12,7 +12,9 @@ import {
   ShieldAlert,
   Flame,
   User,
-  CheckCircle2
+  CheckCircle2,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { useVoltStore } from '@/lib/store';
 
@@ -34,6 +36,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
     globalSafetyReset, 
     globalAnomaly,
     safetyLatchLocked,
+    audioMuted,
+    toggleAudioMute,
     settings,
     userActiveTab
   } = useVoltStore();
@@ -122,6 +126,23 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
           >
             <RotateCcw className={`h-3.5 w-3.5 ${globalAnomaly ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Reset Safety Latch</span>
+          </button>
+
+          {/* Audio Alarm Sound Toggle */}
+          <button
+            onClick={toggleAudioMute}
+            title={audioMuted ? 'Unmute Alarm Sound' : 'Mute Alarm Sound'}
+            className={`rounded-xl p-2 transition-all border ${
+              audioMuted
+                ? 'border-amber-500/40 bg-amber-500/10 text-amber-500'
+                : globalAnomaly
+                ? 'border-rose-500 bg-rose-500/20 text-rose-600 dark:text-rose-400 animate-pulse ring-2 ring-rose-500/40'
+                : settings.theme === 'light'
+                ? 'border-[#DCE5D9] bg-white text-[#347A53] hover:bg-[#F5F7F0]'
+                : 'border-[#354456] bg-[#202D3D] text-[#36B879] hover:text-white hover:bg-[#273648]'
+            }`}
+          >
+            {audioMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
 
           {/* Settings Nav Link */}
