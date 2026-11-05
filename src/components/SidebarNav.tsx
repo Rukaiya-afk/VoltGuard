@@ -391,7 +391,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
                 Pro Fleet
               </button>
               <button
-                onClick={() => loginAsAdmin('rukaiya.admin@gmail.com')}
+                onClick={() => loginAsAdmin('rukaiyasabunwala@gmail.com')}
                 className={`flex-1 py-1 px-1.5 rounded-lg text-center transition ${
                   currentUserRole === 'admin'
                     ? settings.theme === 'light' ? 'bg-[#26382D] text-white shadow-xs' : 'bg-[#4B91D9] text-white shadow-xs'

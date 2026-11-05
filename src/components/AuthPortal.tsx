@@ -52,7 +52,7 @@ export const AuthPortal: React.FC = () => {
       setIdentifier('vikram.electrician@gmail.com');
       setPassword('electrician123');
     } else {
-      setIdentifier('rukaiya.admin@gmail.com');
+      setIdentifier('rukaiyasabunwala@gmail.com');
       setPassword('adminpassword123');
     }
   };
@@ -228,7 +228,7 @@ export const AuthPortal: React.FC = () => {
                       ? 'e.g. rajesh.sharma@gmail.com'
                       : selectedRole === 'electrician'
                       ? 'e.g. vikram.electrician@gmail.com'
-                      : 'e.g. rukaiya.admin@gmail.com'
+                      : 'e.g. rukaiyasabunwala@gmail.com'
                   }
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs md:text-sm text-white focus:outline-none focus:border-teal-400 transition"
                 />
@@ -378,13 +378,13 @@ export const AuthPortal: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    setIdentifier('rukaiya.admin@gmail.com');
+                    setIdentifier('rukaiyasabunwala@gmail.com');
                     setPassword('adminpassword123');
                   }}
                   className="w-full flex justify-between items-center bg-slate-900/60 hover:bg-slate-800 p-1.5 rounded-lg text-left transition"
                 >
                   <span>🛡️ <strong>Rukaiya Admin</strong>:</span>
-                  <span className="font-mono text-indigo-300">rukaiya.admin@gmail.com / adminpassword123</span>
+                  <span className="font-mono text-indigo-300">rukaiyasabunwala@gmail.com / adminpassword123</span>
                 </button>
               </div>
             )}
@@ -441,7 +441,7 @@ export const AuthPortal: React.FC = () => {
                       required
                       value={forgotIdentifier}
                       onChange={(e) => setForgotIdentifier(e.target.value)}
-                      placeholder="e.g. rajesh.sharma@gmail.com / rukaiya.admin@gmail.com"
+                      placeholder="e.g. rajesh.sharma@gmail.com / rukaiyasabunwala@gmail.com"
                       className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-teal-400"
                     />
                     <button

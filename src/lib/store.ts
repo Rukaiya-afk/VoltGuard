@@ -552,7 +552,7 @@ export const useVoltStore = create<VoltGuardState>()(
       electricianProfile: SEEDED_ELECTRICIANS[0],
       adminProfile: {
         name: 'Rukaiya (Chief Safety Administrator)',
-        email: 'rukaiya.admin@gmail.com',
+        email: 'rukaiyasabunwala@gmail.com',
         role: 'admin',
         title: 'Safety Command & Grid Operations Head',
       },
@@ -749,7 +749,7 @@ export const useVoltStore = create<VoltGuardState>()(
           currentUserRole: 'admin',
           adminProfile: {
             name: 'Rukaiya (Chief Safety Administrator)',
-            email: email || 'rukaiya.admin@gmail.com',
+            email: email || 'rukaiyasabunwala@gmail.com',
             role: 'admin',
             title: 'Safety Command & Grid Operations Head',
           },
@@ -759,7 +759,7 @@ export const useVoltStore = create<VoltGuardState>()(
       loginWithCredentials: (emailOrConsumerId: string, role: UserRole) => {
         const val = emailOrConsumerId.trim().toLowerCase();
         if (role === 'admin') {
-          get().loginAsAdmin(val || 'rukaiya.admin@gmail.com');
+          get().loginAsAdmin(val || 'rukaiyasabunwala@gmail.com');
           return true;
         } else if (role === 'electrician') {
           const elec = get().electricians.find(
