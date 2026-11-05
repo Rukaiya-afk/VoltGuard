@@ -12,7 +12,6 @@ import {
   MessageSquare, 
   PhoneCall, 
   AlertOctagon, 
-  Settings, 
   ShieldCheck, 
   Users, 
   Flame, 
@@ -163,18 +162,6 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
         { id: 'chat', label: 'Help Desk & SMS OTP', active: userActiveTab === 'chat', onClick: () => setUserActiveTab('chat') },
         { id: 'call_dept', label: 'Contact Electricity Dept', active: userActiveTab === 'call_dept', onClick: () => setUserActiveTab('call_dept') },
       ]
-    },
-    {
-      key: 'settings',
-      label: 'System Settings',
-      icon: Settings,
-      active: pathname.startsWith('/settings'),
-      href: '/settings',
-      children: [
-        { id: 'settings_theme', label: 'Appearance & Theme', href: '/settings/theme', active: pathname === '/settings/theme' },
-        { id: 'settings_alerts', label: 'Alert Tones & Volume', href: '/settings/alerts', active: pathname === '/settings/alerts' },
-        { id: 'settings_sensitivity', label: 'Fire Sensitivity', href: '/settings/sensitivity', active: pathname === '/settings/sensitivity' },
-      ]
     }
   ];
 
@@ -230,17 +217,6 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
       children: [
         { id: 'model_testing', label: 'Isolation Forest Testing', active: adminActiveTab === 'model_testing', onClick: () => setAdminActiveTab('model_testing') },
       ]
-    },
-    {
-      key: 'settings',
-      label: 'Admin Settings',
-      icon: Sliders,
-      active: adminActiveTab === 'settings' || pathname.startsWith('/settings'),
-      onSelect: () => setAdminActiveTab('settings'),
-      children: [
-        { id: 'admin_settings', label: 'Sensor Sensitivity', active: adminActiveTab === 'settings', onClick: () => setAdminActiveTab('settings') },
-        { id: 'global_settings', label: 'App Settings Hub', href: '/settings', active: pathname === '/settings' },
-      ]
     }
   ];
 
@@ -277,16 +253,6 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
         { id: 'report', label: 'Report Incident', active: electricianActiveTab === 'report', onClick: () => setElectricianActiveTab('report') },
         { id: 'reviews', label: 'Customer Ratings', active: electricianActiveTab === 'reviews', onClick: () => setElectricianActiveTab('reviews') },
         { id: 'profile', label: 'Pro Qualifications', active: electricianActiveTab === 'profile', onClick: () => setElectricianActiveTab('profile') },
-      ]
-    },
-    {
-      key: 'settings',
-      label: 'Settings',
-      icon: Settings,
-      active: pathname.startsWith('/settings'),
-      href: '/settings',
-      children: [
-        { id: 'elec_settings', label: 'Preferences & Theme', href: '/settings/theme', active: pathname === '/settings/theme' }
       ]
     }
   ];
