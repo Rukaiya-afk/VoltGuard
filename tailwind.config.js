@@ -1,3 +1,5 @@
+const plugin = require('tailwindcss/plugin');
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
@@ -66,5 +68,10 @@ module.exports = {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function({ addVariant }) {
+      addVariant('theme-light', ['.theme-light &', '.theme-light&', '[data-theme="light"] &', '[data-theme="light"]&']);
+      addVariant('theme-slate', ['.theme-slate &', '.theme-slate&', '[data-theme="slate"] &', '[data-theme="slate"]&']);
+    }),
+  ],
 }

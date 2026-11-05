@@ -148,7 +148,7 @@ export const ElectricianPortal: React.FC = () => {
       ">
         <div className="flex items-center space-x-4">
           <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-2xl shrink-0
-            bg-[#E0B34E]/20 border border-[#E0B34E]/40 text-[#E0B34E]
+            bg-[#273648] border border-[#354456] text-[#36B879]
             theme-light:bg-[#D4E4D0] theme-light:text-[#347A53] theme-light:border-[#77A985]
           ">
             ⚡
@@ -157,10 +157,10 @@ export const ElectricianPortal: React.FC = () => {
             <div className="flex items-center space-x-2">
               <h2 className="text-base md:text-lg font-bold text-white theme-light:text-[#26382D]">{currentElec.name}</h2>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold flex items-center space-x-1 font-mono uppercase tracking-wider
-                bg-[#E0B34E]/20 text-[#E0B34E] border border-[#E0B34E]/40
+                bg-[#273648] text-[#E8EEF5] border border-[#354456]
                 theme-light:bg-[#D4E4D0] theme-light:text-[#347A53] theme-light:border-[#77A985]
               ">
-                <Award className="w-3 h-3" />
+                <Award className="w-3 h-3 text-[#36B879] theme-light:text-[#347A53]" />
                 <span>Certified Field Pro</span>
               </span>
             </div>

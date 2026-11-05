@@ -189,6 +189,12 @@ export default function DashboardPage() {
     }
   }, [globalAnomaly, audioMuted, settings.alarmTone, settings.alarmVolume]);
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.className = `theme-${settings.theme}`;
+    }
+  }, [settings.theme]);
+
   if (!isAuthenticated) {
     return <AuthPortal />;
   }

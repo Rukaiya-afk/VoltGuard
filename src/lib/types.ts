@@ -49,7 +49,7 @@ export interface TelemetryFrame {
   forensic_alert: ForensicAlert | null;
 }
 
-export type ThemeOption = 'oled' | 'slate' | 'light';
+export type ThemeOption = 'slate' | 'light';
 export type RefreshRate = 500 | 1000 | 2000;
 export type AlarmTone = 'buzzer' | 'siren' | 'chime' | 'synth' | 'custom';
 export type VibrationPattern = 'pulse' | 'sos' | 'continuous' | 'subtle';

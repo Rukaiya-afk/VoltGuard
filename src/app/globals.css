@@ -25,28 +25,6 @@
     --input-bg: #192330;
   }
 
-  .theme-oled {
-    --vg-bg-main: #05080C;
-    --vg-bg-sec: #0E141B;
-    --vg-bg-nav: #090E14;
-    --vg-bg-card: #111721;
-    --vg-bg-elevated: #182230;
-    --vg-border: #233041;
-    --vg-text-pri: #F0F4F8;
-    --vg-text-sec: #8E9BAE;
-    --vg-emerald: #36B879;
-    --vg-amber: #E0B34E;
-    --vg-crimson: #E45B63;
-    --vg-blue: #4B91D9;
-
-    --bg-primary: #05080C;
-    --card-bg: #111721;
-    --card-border: #233041;
-    --text-primary: #F0F4F8;
-    --text-muted: #8E9BAE;
-    --input-bg: #0E141B;
-  }
-
   .theme-light {
     --vg-bg-main: #F5F7F0;
     --vg-bg-sec: #E8EFDF;
@@ -184,6 +162,47 @@ html.theme-light, body.theme-light, .theme-light {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
 }
 
+/* Card & Block Surfaces in Light Mode (Pure White, paler than sage background) */
+.theme-light .bg-\[\#202D3D\],
+.theme-light .bg-\[\#202D3D\]\/50,
+.theme-light .bg-\[\#202D3D\]\/80,
+.theme-light .bg-\[\#192330\],
+.theme-light .bg-\[\#273648\],
+.theme-light .bg-\[\#111820\],
+.theme-light [class*="bg-[#202D3D]"],
+.theme-light [class*="bg-[#192330]"],
+.theme-light [class*="bg-[#273648]"],
+.theme-light [class*="bg-[#111820]"] {
+  background-color: #FFFFFF !important;
+  border-color: #DCE5D9 !important;
+  color: #26382D !important;
+}
+
+/* Inner Pill Bars in Light Mode (Soft Sage #E8EFDF) */
+.theme-light .bg-\[\#182431\],
+.theme-light [class*="bg-[#182431]"]:not(aside) {
+  background-color: #E8EFDF !important;
+  border-color: #DCE5D9 !important;
+  color: #26382D !important;
+}
+
+/* Borders in Light Mode */
+.theme-light .border-\[\#354456\],
+.theme-light [class*="border-[#354456]"] {
+  border-color: #DCE5D9 !important;
+}
+
+/* Primary and Muted Text in Light Mode */
+.theme-light .text-\[\#E8EEF5\],
+.theme-light [class*="text-[#E8EEF5]"] {
+  color: #26382D !important;
+}
+
+.theme-light .text-\[\#A6B3C1\],
+.theme-light [class*="text-[#A6B3C1]"] {
+  color: #69776C !important;
+}
+
 .theme-light .border-slate-800,
 .theme-light .border-slate-700,
 .theme-light .border-slate-800\/60,
@@ -260,27 +279,6 @@ html.theme-light, body.theme-light, .theme-light {
 
 .theme-light text {
   fill: #26382D !important;
-}
-
-/* =========================================================================
-   OLED THEME: TRUE PITCH BLACK (#000000 / #09090B / #202D3D)
-   ========================================================================= */
-html.theme-oled, body.theme-oled, .theme-oled {
-  background-color: #000000 !important;
-  color: #F8FAFC !important;
-}
-.theme-oled .bg-slate-950,
-.theme-oled .bg-slate-900,
-.theme-oled .bg-slate-900\/90,
-.theme-oled .bg-slate-900\/80,
-.theme-oled .bg-slate-900\/60,
-.theme-oled .bg-slate-900\/50 {
-  background-color: #09090B !important;
-  border-color: #27272A !important;
-}
-.theme-oled header {
-  background-color: rgba(0, 0, 0, 0.95) !important;
-  border-bottom-color: #27272A !important;
 }
 
 /* =========================================================================

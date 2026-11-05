@@ -109,9 +109,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   };
 
   const handleThemeCycle = () => {
-    const nextTheme: ThemeOption = 
-      settings.theme === 'slate' ? 'light' : 
-      settings.theme === 'light' ? 'oled' : 'slate';
+    const nextTheme: ThemeOption = settings.theme === 'slate' ? 'light' : 'slate';
     updateSettings({ theme: nextTheme });
     if (typeof document !== 'undefined') {
       document.documentElement.className = `theme-${nextTheme}`;
@@ -122,45 +120,73 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
   // Build role-specific navigation hierarchy
   const residentNavSections: NavSection[] = [
     {
+      key: 'overview',
+      label: 'Overview',
+      icon: LayoutDashboard,
+      active: userActiveTab === 'overview',
+      onSelect: () => setUserActiveTab('overview'),
+      children: [
+        { id: 'overview_main', label: 'Key Metrics & Status', active: userActiveTab === 'overview', onClick: () => setUserActiveTab('overview') },
+      ]
+    },
+    {
       key: 'switchboard',
-      label: 'Digital Twin',
+      label: 'Circuit Switchboard',
       icon: Zap,
       active: userActiveTab === 'switchboard',
       onSelect: () => setUserActiveTab('switchboard'),
       children: [
-        { id: 'switchboard', label: 'Circuit Switchboard', active: userActiveTab === 'switchboard', onClick: () => setUserActiveTab('switchboard') },
+        { id: 'switchboard_breakers', label: 'Breakers & Controls', active: userActiveTab === 'switchboard', onClick: () => setUserActiveTab('switchboard') },
       ]
     },
     {
       key: 'telemetry',
-      label: 'Live Telemetry',
+      label: 'Telemetry Graphs',
       icon: Activity,
       active: userActiveTab === 'telemetry',
       onSelect: () => setUserActiveTab('telemetry'),
       children: [
-        { id: 'telemetry_stream', label: 'Interactive Waveforms', active: userActiveTab === 'telemetry', onClick: () => setUserActiveTab('telemetry') },
+        { id: 'telemetry_stream', label: 'Live Power Graphs', active: userActiveTab === 'telemetry', onClick: () => setUserActiveTab('telemetry') },
       ]
     },
     {
       key: 'billing',
-      label: 'Utility Billing',
+      label: 'Utility Billing & Census',
       icon: DollarSign,
       active: userActiveTab === 'billing',
       onSelect: () => setUserActiveTab('billing'),
       children: [
-        { id: 'billing_summary', label: 'Energy Disaggregation', active: userActiveTab === 'billing', onClick: () => setUserActiveTab('billing') },
+        { id: 'billing_summary', label: 'Disaggregated Usage', active: userActiveTab === 'billing', onClick: () => setUserActiveTab('billing') },
       ]
     },
     {
-      key: 'services',
-      label: 'Field Services',
-      icon: Wrench,
-      active: ['electrician', 'chat', 'call_dept'].includes(userActiveTab),
+      key: 'electrician',
+      label: 'Book Electrician',
+      icon: UserCheck,
+      active: userActiveTab === 'electrician',
       onSelect: () => setUserActiveTab('electrician'),
       children: [
-        { id: 'electrician', label: 'Book Certified Electrician', active: userActiveTab === 'electrician', onClick: () => setUserActiveTab('electrician') },
-        { id: 'chat', label: 'Help Desk & SMS OTP', active: userActiveTab === 'chat', onClick: () => setUserActiveTab('chat') },
-        { id: 'call_dept', label: 'Contact Electricity Dept', active: userActiveTab === 'call_dept', onClick: () => setUserActiveTab('call_dept') },
+        { id: 'electrician_booking', label: 'Book Certified Pro', active: userActiveTab === 'electrician', onClick: () => setUserActiveTab('electrician') },
+      ]
+    },
+    {
+      key: 'chat',
+      label: 'Safety Help Desk & OTP',
+      icon: MessageSquare,
+      active: userActiveTab === 'chat',
+      onSelect: () => setUserActiveTab('chat'),
+      children: [
+        { id: 'help_desk_chat', label: 'Support & SMS OTP', active: userActiveTab === 'chat', onClick: () => setUserActiveTab('chat') },
+      ]
+    },
+    {
+      key: 'call_dept',
+      label: 'Emergency Hotlines',
+      icon: PhoneCall,
+      active: userActiveTab === 'call_dept',
+      onSelect: () => setUserActiveTab('call_dept'),
+      children: [
+        { id: 'emergency_contacts', label: 'Fire & Grid Help', active: userActiveTab === 'call_dept', onClick: () => setUserActiveTab('call_dept') },
       ]
     }
   ];
@@ -281,8 +307,8 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
           theme-light:bg-[#E2EBD9] theme-light:border-[#DCE5D9] theme-light:text-[#26382D]
         `}
         style={{
-          backgroundColor: settings.theme === 'light' ? '#E2EBD9' : settings.theme === 'oled' ? '#090E14' : '#182431',
-          borderColor: settings.theme === 'light' ? '#DCE5D9' : settings.theme === 'oled' ? '#233041' : '#354456',
+          backgroundColor: settings.theme === 'light' ? '#E2EBD9' : '#182431',
+          borderColor: settings.theme === 'light' ? '#DCE5D9' : '#354456',
         }}
       >
         {/* Brand Header */}
@@ -540,7 +566,7 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
             {/* Theme Toggle Button */}
             <button
               onClick={handleThemeCycle}
-              title={`Switch Theme (Current: ${settings.theme.toUpperCase()})`}
+              title={`Switch Theme (Current: ${settings.theme === 'light' ? 'Light Theme' : 'Dark Theme'})`}
               className={`flex items-center justify-center h-8 flex-1 rounded-lg border transition-colors
                 ${settings.theme === 'light'
                   ? 'border-[#DCE5D9] bg-white text-[#26382D] hover:bg-[#F5F7F0]'
@@ -550,14 +576,12 @@ export const SidebarNav: React.FC<SidebarNavProps> = ({
             >
               {settings.theme === 'light' ? (
                 <Sun className="h-3.5 w-3.5 text-[#B87A24]" />
-              ) : settings.theme === 'oled' ? (
-                <Moon className="h-3.5 w-3.5 text-[#36B879]" />
               ) : (
-                <Monitor className="h-3.5 w-3.5 text-[#4B91D9]" />
+                <Monitor className="h-3.5 w-3.5 text-[#36B879]" />
               )}
               {!collapsed && (
                 <span className="ml-1.5 text-[10px] font-bold uppercase">
-                  {settings.theme}
+                  {settings.theme === 'light' ? 'Light' : 'Dark'}
                 </span>
               )}
             </button>

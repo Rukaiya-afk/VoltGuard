@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useVoltStore } from '@/lib/store';
 
 interface ElectricalGaugeProps {
   value: number;
@@ -62,6 +63,9 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
   const amberArc = describeArc(cx, cy, r, greenEndAngle, amberEndAngle);
   const redArc = describeArc(cx, cy, r, amberEndAngle, 90);
 
+  const { settings } = useVoltStore();
+  const isLight = settings.theme === 'light';
+
   // Needle tip coordinates
   const needleAngle = -90 + percent * 180;
   const needleTip = polarToCartesian(cx, cy, r - 8, needleAngle);
@@ -69,11 +73,15 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
   // Determine current value status color
   const statusColor = 
     percent >= critPct ? '#E45B63' :
-    percent >= warnPct ? '#E0B34E' :
-    '#36B879';
+    percent >= warnPct ? (isLight ? '#B87A24' : '#E0B34E') :
+    (isLight ? '#347A53' : '#36B879');
 
   return (
-    <div className="flex flex-col items-center justify-center p-3 rounded-2xl bg-[#202D3D]/50 border border-[#354456] theme-light:bg-white theme-light:border-[#DCE5D9] transition-all">
+    <div className={`flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
+      isLight 
+        ? 'bg-white border-[#DCE5D9] shadow-sm' 
+        : 'bg-[#202D3D] border-[#354456]'
+    }`}>
       <div className="relative w-40 h-24 overflow-hidden flex items-end justify-center">
         <svg viewBox="0 0 180 100" className="w-full h-full overflow-visible">
           {/* Background Track */}
@@ -82,7 +90,7 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
             fill="none"
             stroke="currentColor"
             strokeWidth="14"
-            className="text-slate-800/40 theme-light:text-slate-200"
+            className={isLight ? 'text-[#E8EFDF]' : 'text-slate-800/40'}
             strokeLinecap="round"
           />
 
@@ -90,9 +98,9 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
           <path
             d={greenArc}
             fill="none"
-            stroke="#36B879"
+            stroke={isLight ? '#347A53' : '#36B879'}
             strokeWidth="14"
-            strokeOpacity="0.85"
+            strokeOpacity={isLight ? '0.9' : '0.85'}
             strokeLinecap="round"
           />
 
@@ -100,23 +108,23 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
           <path
             d={amberArc}
             fill="none"
-            stroke="#E0B34E"
+            stroke={isLight ? '#B87A24' : '#E0B34E'}
             strokeWidth="14"
-            strokeOpacity="0.85"
+            strokeOpacity={isLight ? '0.9' : '0.85'}
           />
 
           {/* Red Zone */}
           <path
             d={redArc}
             fill="none"
-            stroke="#E45B63"
+            stroke={isLight ? '#C93B46' : '#E45B63'}
             strokeWidth="14"
-            strokeOpacity="0.85"
+            strokeOpacity={isLight ? '0.9' : '0.85'}
             strokeLinecap="round"
           />
 
           {/* Pivot Center Point */}
-          <circle cx={cx} cy={cy} r="6" fill="#A6B3C1" className="theme-light:fill-[#69776C]" />
+          <circle cx={cx} cy={cy} r="6" fill={isLight ? '#69776C' : '#A6B3C1'} />
 
           {/* Needle Line */}
           <line
@@ -124,10 +132,10 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
             y1={cy}
             x2={needleTip.x}
             y2={needleTip.y}
-            stroke="#FFFFFF"
+            stroke={isLight ? '#26382D' : '#FFFFFF'}
             strokeWidth="2.5"
             strokeLinecap="round"
-            className="theme-light:stroke-[#26382D] drop-shadow-sm transition-all duration-300"
+            className="drop-shadow-sm transition-all duration-300"
           />
         </svg>
 
@@ -142,10 +150,10 @@ export const ElectricalGauge: React.FC<ElectricalGaugeProps> = ({
 
       {/* Label under Gauge */}
       <div className="mt-1 text-center">
-        <div className="text-xs font-bold text-[#E8EEF5] theme-light:text-[#26382D] tracking-tight">
+        <div className={`text-xs font-bold tracking-tight ${isLight ? 'text-[#26382D]' : 'text-[#E8EEF5]'}`}>
           {label}
         </div>
-        <div className="text-[10px] text-[#A6B3C1] theme-light:text-[#69776C] font-mono">
+        <div className={`text-[10px] font-mono ${isLight ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
           Range: {min}{unit} - {max}{unit}
         </div>
       </div>

@@ -11,8 +11,6 @@ import {
   Menu,
   ShieldAlert,
   Flame,
-  Volume2,
-  VolumeX,
   User,
   CheckCircle2
 } from 'lucide-react';
@@ -34,8 +32,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
     loginAsElectrician,
     loginAsAdmin,
     globalSafetyReset, 
-    audioMuted, 
-    toggleAudioMute,
     globalAnomaly,
     safetyLatchLocked,
     settings,
@@ -45,18 +41,19 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
   // Compute breadcrumb title based on route and tab
   const getSectionTitle = () => {
     if (pathname.startsWith('/settings')) {
-      return 'System Settings';
+      return 'Settings';
     }
     if (currentUserRole === 'user') {
       switch (userActiveTab) {
-        case 'switchboard': return 'Digital Twin Switchboard';
-        case 'telemetry': return 'Live Telemetry Waveforms';
+        case 'overview': return 'Home Overview';
+        case 'switchboard': return 'Circuit Switchboard';
+        case 'telemetry': return 'Telemetry Graphs';
         case 'billing': return 'Utility Billing & Census';
-        case 'electrician': return 'Certified Electrician Booking';
-        case 'chat': return 'Safety Help Desk & Twilio OTP';
-        case 'call_dept': return 'Electricity Department Clearance';
-        case 'report_bug': return 'Incident & Bug Reporting';
-        default: return 'Resident Monitoring';
+        case 'electrician': return 'Book Electrician';
+        case 'chat': return 'Safety Help Desk & OTP';
+        case 'call_dept': return 'Emergency Hotlines';
+        case 'report_bug': return 'Incident Report';
+        default: return 'Home Overview';
       }
     } else if (currentUserRole === 'electrician') {
       return 'Field Pro Dispatch Queue';
@@ -71,8 +68,8 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
       theme-light:bg-[#E2EBD9]/95 theme-light:border-[#DCE5D9] theme-light:text-[#26382D]
     "
     style={{
-      backgroundColor: settings.theme === 'light' ? 'rgba(226, 235, 217, 0.95)' : settings.theme === 'oled' ? 'rgba(0, 0, 0, 0.95)' : 'rgba(24, 36, 49, 0.95)',
-      borderColor: settings.theme === 'light' ? '#DCE5D9' : settings.theme === 'oled' ? '#27272A' : '#354456'
+      backgroundColor: settings.theme === 'light' ? 'rgba(226, 235, 217, 0.95)' : 'rgba(24, 36, 49, 0.95)',
+      borderColor: settings.theme === 'light' ? '#DCE5D9' : '#354456'
     }}>
       <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         
@@ -125,21 +122,6 @@ export const Header: React.FC<HeaderProps> = ({ onToggleMobileNav }) => {
           >
             <RotateCcw className={`h-3.5 w-3.5 ${globalAnomaly ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">Reset Safety Latch</span>
-          </button>
-
-          {/* Audio Mute / Unmute */}
-          <button
-            onClick={toggleAudioMute}
-            title={audioMuted ? 'Unmute Alarms' : 'Mute Alarms'}
-            className={`rounded-xl p-2 transition-colors border ${
-              audioMuted
-                ? 'border-amber-500/40 bg-amber-500/10 text-amber-400'
-                : settings.theme === 'light'
-                ? 'border-[#DCE5D9] bg-white text-[#347A53] hover:bg-[#F5F7F0]'
-                : 'border-[#354456] bg-[#202D3D] text-[#A6B3C1] hover:text-white hover:bg-[#273648]'
-            }`}
-          >
-            {audioMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
           </button>
 
           {/* Settings Nav Link */}

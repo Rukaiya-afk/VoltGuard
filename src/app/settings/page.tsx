@@ -33,7 +33,7 @@ export default function SettingsHubPage() {
     }
   }, [isAuthenticated, router]);
 
-  const handleThemeChange = (theme: 'oled' | 'slate' | 'light') => {
+  const handleThemeChange = (theme: 'slate' | 'light') => {
     updateSettings({ theme });
     if (typeof document !== 'undefined') {
       document.documentElement.className = `theme-${theme}`;
@@ -57,7 +57,7 @@ export default function SettingsHubPage() {
       id: 'theme',
       href: '/settings/theme',
       title: 'Display Color & Theme',
-      desc: 'Switch between Pitch Black (OLED), Dark Slate, and Crisp Light for comfortable reading.',
+      desc: 'Switch between Dark Slate and Light Sage for comfortable viewing.',
       icon: Monitor,
       badge: settings.theme.toUpperCase(),
       color: 'text-cyan-400 border-cyan-500/40 bg-cyan-500/10'
@@ -164,21 +164,11 @@ export default function SettingsHubPage() {
             <div className="flex items-center rounded-xl border border-slate-800 bg-slate-950 p-1">
               <button
                 type="button"
-                onClick={() => handleThemeChange('oled')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  settings.theme === 'oled' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-white'
-                }`}
-                title="OLED Dark"
-              >
-                <Moon className="h-3.5 w-3.5" />
-              </button>
-              <button
-                type="button"
                 onClick={() => handleThemeChange('slate')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   settings.theme === 'slate' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-white'
                 }`}
-                title="Deep Slate"
+                title="Dark Slate"
               >
                 <Monitor className="h-3.5 w-3.5" />
               </button>
@@ -188,7 +178,7 @@ export default function SettingsHubPage() {
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                   settings.theme === 'light' ? 'bg-teal-600 text-white shadow' : 'text-slate-400 hover:text-white'
                 }`}
-                title="Minimal Light"
+                title="Light Sage"
               >
                 <Sun className="h-3.5 w-3.5" />
               </button>

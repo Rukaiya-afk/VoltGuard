@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Monitor, Moon, Sun, Check } from 'lucide-react';
+import { ArrowLeft, Monitor, Sun, Check } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { useVoltStore } from '@/lib/store';
 import { ThemeOption } from '@/lib/types';
@@ -21,24 +21,17 @@ export default function ThemeSettingsPage() {
   const themes: Array<{ id: ThemeOption; title: string; desc: string; icon: any; bgPreview: string }> = [
     {
       id: 'slate',
-      title: 'Industrial SCADA Navy',
-      desc: 'Deep navy telemetry console inspired by electrical SCADA monitoring workstations.',
+      title: 'Dark Theme',
+      desc: 'Comfortable dark slate interface with high-contrast meters, clear graphs, and reduced eye strain.',
       icon: Monitor,
       bgPreview: 'bg-[#111820] border-[#354456] text-[#36B879]'
     },
     {
       id: 'light',
-      title: 'Soothing Sage Green',
-      desc: 'Muted sage-green and crisp off-white interface with luminous cards and clear typography.',
+      title: 'Light Theme',
+      desc: 'Clean, soothing light green interface with white cards and easy-to-read typography.',
       icon: Sun,
       bgPreview: 'bg-[#F5F7F0] border-[#DCE5D9] text-[#347A53]'
-    },
-    {
-      id: 'oled',
-      title: 'OLED Pitch Black',
-      desc: 'True pitch-black surface optimized for OLED panels and battery savings.',
-      icon: Moon,
-      bgPreview: 'bg-black border-[#27272A] text-[#36B879]'
     }
   ];
 
@@ -72,7 +65,7 @@ export default function ThemeSettingsPage() {
             Select your preferred visual environment. The theme updates instantly across all monitoring screens.
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 max-w-2xl mx-auto">
             {themes.map((t) => {
               const Icon = t.icon;
               const isSelected = settings.theme === t.id;

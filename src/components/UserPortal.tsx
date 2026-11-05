@@ -234,180 +234,278 @@ export const UserPortal: React.FC = () => {
       
       {/* =========================================================================
           SECTION 8: EXECUTIVE DASHBOARD TELEMETRY & GAUGES ROW (Ref 1, 2, 3)
+          Rendered ONLY when Overview is active
           ========================================================================= */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
-        
-        {/* Metric 1: Total Power Draw */}
-        <div className="p-4 rounded-2xl border bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] shadow-sm transition-all hover:scale-[1.01]">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
-              Total Power Draw
-            </span>
-            <div className="p-1.5 rounded-lg bg-[#36B879]/10 text-[#36B879] theme-light:bg-[#E8EFDF] theme-light:text-[#347A53]">
-              <Zap className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="mt-2 text-2xl font-black font-mono tracking-tight text-white theme-light:text-[#26382D]">
-            {Math.round(totalPowerWatts).toLocaleString()}
-            <span className="text-xs font-semibold ml-1 text-[#A6B3C1] theme-light:text-[#69776C]">W</span>
-          </div>
-          <div className="mt-1 text-[11px] text-[#36B879] theme-light:text-[#347A53] flex items-center space-x-1 font-semibold">
-            <TrendingUp className="h-3 w-3" />
-            <span>Aggregate Home Load</span>
-          </div>
-        </div>
-
-        {/* Metric 2: Mains Line Voltage */}
-        <div className="p-4 rounded-2xl border bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] shadow-sm transition-all hover:scale-[1.01]">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
-              Mains Voltage
-            </span>
-            <div className="p-1.5 rounded-lg bg-[#4B91D9]/10 text-[#4B91D9] theme-light:bg-[#E8EFDF] theme-light:text-[#2A6F97]">
-              <Activity className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="mt-2 text-2xl font-black font-mono tracking-tight text-white theme-light:text-[#26382D]">
-            {mainsVoltage.toFixed(1)}
-            <span className="text-xs font-semibold ml-1 text-[#A6B3C1] theme-light:text-[#69776C]">V</span>
-          </div>
-          <div className="mt-1 text-[11px] text-[#A6B3C1] theme-light:text-[#69776C] flex items-center space-x-1">
-            <span>Grid Standard: 230V AC</span>
-          </div>
-        </div>
-
-        {/* Metric 3: Active Circuits */}
-        <div className="p-4 rounded-2xl border bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D] shadow-sm transition-all hover:scale-[1.01]">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
-              Monitored Circuits
-            </span>
-            <div className="p-1.5 rounded-lg bg-[#E0B34E]/10 text-[#E0B34E] theme-light:bg-[#E8EFDF] theme-light:text-[#B87A24]">
-              <Gauge className="h-4 w-4" />
-            </div>
-          </div>
-          <div className="mt-2 text-2xl font-black font-mono tracking-tight text-white theme-light:text-[#26382D]">
-            {activeCircuitsCount}
-            <span className="text-xs font-semibold ml-1 text-[#A6B3C1] theme-light:text-[#69776C]">/ {totalCircuitsCount} Live</span>
-          </div>
-          <div className="mt-1 text-[11px] text-[#36B879] theme-light:text-[#347A53] flex items-center space-x-1 font-semibold">
-            <CheckCircle2 className="h-3 w-3" />
-            <span>Digital Twin Synced</span>
-          </div>
-        </div>
-
-        {/* Metric 4: Safety & Fire Status */}
-        <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
-          hasCriticalAnomaly
-            ? 'bg-rose-500/10 border-rose-500/50 text-rose-300'
-            : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5] theme-light:bg-white theme-light:border-[#DCE5D9] theme-light:text-[#26382D]'
-        }`}>
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-[#A6B3C1] theme-light:text-[#69776C] uppercase tracking-wider">
-              Safety Status
-            </span>
-            <div className={`p-1.5 rounded-lg ${
-              hasCriticalAnomaly 
-                ? 'bg-rose-600 text-white animate-pulse' 
-                : 'bg-[#36B879]/10 text-[#36B879] theme-light:bg-[#E8EFDF] theme-light:text-[#347A53]'
+      {(userActiveTab === 'overview' || !userActiveTab) && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+            
+            {/* Metric 1: Total Power Draw */}
+            <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
+              settings.theme === 'light' 
+                ? 'bg-white border-[#DCE5D9] text-[#26382D]' 
+                : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
             }`}>
-              {hasCriticalAnomaly ? <Flame className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>
+                  Total Power Draw
+                </span>
+                <div className={`p-1.5 rounded-lg ${
+                  settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#347A53]' : 'bg-[#36B879]/10 text-[#36B879]'
+                }`}>
+                  <Zap className="h-4 w-4" />
+                </div>
+              </div>
+              <div className={`mt-2 text-2xl font-black font-mono tracking-tight ${
+                settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'
+              }`}>
+                {Math.round(totalPowerWatts).toLocaleString()}
+                <span className={`text-xs font-semibold ml-1 ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>W</span>
+              </div>
+              <div className={`mt-1 text-[11px] flex items-center space-x-1 font-semibold ${
+                settings.theme === 'light' ? 'text-[#347A53]' : 'text-[#36B879]'
+              }`}>
+                <TrendingUp className="h-3 w-3" />
+                <span>Aggregate Home Load</span>
+              </div>
+            </div>
+
+            {/* Metric 2: Mains Line Voltage */}
+            <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
+              settings.theme === 'light' 
+                ? 'bg-white border-[#DCE5D9] text-[#26382D]' 
+                : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>
+                  Mains Voltage
+                </span>
+                <div className={`p-1.5 rounded-lg ${
+                  settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#2A6F97]' : 'bg-[#4B91D9]/10 text-[#4B91D9]'
+                }`}>
+                  <Activity className="h-4 w-4" />
+                </div>
+              </div>
+              <div className={`mt-2 text-2xl font-black font-mono tracking-tight ${
+                settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'
+              }`}>
+                {mainsVoltage.toFixed(1)}
+                <span className={`text-xs font-semibold ml-1 ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>V</span>
+              </div>
+              <div className={`mt-1 text-[11px] flex items-center space-x-1 ${
+                settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+              }`}>
+                <span>Grid Standard: 230V AC</span>
+              </div>
+            </div>
+
+            {/* Metric 3: Active Circuits */}
+            <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
+              settings.theme === 'light' 
+                ? 'bg-white border-[#DCE5D9] text-[#26382D]' 
+                : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>
+                  Monitored Circuits
+                </span>
+                <div className={`p-1.5 rounded-lg ${
+                  settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#B87A24]' : 'bg-[#E0B34E]/10 text-[#E0B34E]'
+                }`}>
+                  <Gauge className="h-4 w-4" />
+                </div>
+              </div>
+              <div className={`mt-2 text-2xl font-black font-mono tracking-tight ${
+                settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'
+              }`}>
+                {activeCircuitsCount}
+                <span className={`text-xs font-semibold ml-1 ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>/ {totalCircuitsCount} Live</span>
+              </div>
+              <div className={`mt-1 text-[11px] flex items-center space-x-1 font-semibold ${
+                settings.theme === 'light' ? 'text-[#347A53]' : 'text-[#36B879]'
+              }`}>
+                <CheckCircle2 className="h-3 w-3" />
+                <span>Digital Twin Synced</span>
+              </div>
+            </div>
+
+            {/* Metric 4: Safety & Fire Status */}
+            <div className={`p-4 rounded-2xl border shadow-sm transition-all hover:scale-[1.01] ${
+              hasCriticalAnomaly
+                ? settings.theme === 'light' ? 'bg-rose-50 border-rose-300 text-rose-800' : 'bg-rose-500/10 border-rose-500/50 text-rose-300'
+                : settings.theme === 'light' ? 'bg-white border-[#DCE5D9] text-[#26382D]' : 'bg-[#202D3D] border-[#354456] text-[#E8EEF5]'
+            }`}>
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] font-bold uppercase tracking-wider ${
+                  settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'
+                }`}>
+                  Safety Status
+                </span>
+                <div className={`p-1.5 rounded-lg ${
+                  hasCriticalAnomaly 
+                    ? 'bg-rose-600 text-white animate-pulse' 
+                    : settings.theme === 'light' ? 'bg-[#E8EFDF] text-[#347A53]' : 'bg-[#36B879]/10 text-[#36B879]'
+                }`}>
+                  {hasCriticalAnomaly ? <Flame className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+                </div>
+              </div>
+              <div className="mt-2 text-xl font-black tracking-tight">
+                {hasCriticalAnomaly ? (
+                  <span className="text-rose-500 font-mono">CIRCUIT ANOMALY</span>
+                ) : (
+                  <span className={settings.theme === 'light' ? 'text-[#347A53]' : 'text-[#36B879]'}>OPTIMAL / SAFE</span>
+                )}
+              </div>
+              <div className={`mt-1 text-[11px] ${settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
+                Lug Peak: <strong className={`font-mono ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>{peakTemperature.toFixed(1)}°C</strong>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Semicircular Telemetry Gauges Banner (Reference Image 3 Inspiration) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ElectricalGauge
+              value={mainsVoltage}
+              min={160}
+              max={280}
+              unit="V"
+              label="Mains Line 1 Voltage (L1)"
+              warnThreshold={185}
+              critThreshold={250}
+            />
+            <ElectricalGauge
+              value={totalPowerWatts}
+              min={0}
+              max={6000}
+              unit="W"
+              label="Household Power Demand (Total Watts)"
+              warnThreshold={3800}
+              critThreshold={5000}
+            />
+          </div>
+
+          {/* Consumer Quick Context Banner */}
+          <div className={`p-4 md:p-5 rounded-2xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm transition-all ${
+            settings.theme === 'light' ? 'bg-white border-[#DCE5D9]' : 'bg-[#202D3D] border-[#354456]'
+          }`}>
+            <div className="flex items-center space-x-3.5">
+              <div className="w-11 h-11 rounded-xl bg-[#347A53] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
+                {userProfile.name.charAt(0)}
+              </div>
+              <div>
+                <div className="flex items-center space-x-2">
+                  <h2 className={`text-base font-bold ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-[#E8EEF5]'}`}>
+                    {userProfile.name}
+                  </h2>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4E4D0] text-[#347A53] border border-[#77A985]">
+                    Kothrud LT-1 Resident
+                  </span>
+                </div>
+                <p className={`text-xs mt-0.5 ${settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
+                  Consumer ID: <strong className={`font-mono ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>{userProfile.consumerNumber}</strong> • {userProfile.blockArea} • Rate: <strong className={`font-mono ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>₹{userProfile.ratePerKwh}/kWh</strong>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => triggerFireEmergencyProtocol('Master Bedroom AC', 'Simulated 180V Brownout Overheating (68°C) in Kothrud')}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center space-x-1.5 border transition shadow-sm ${
+                  settings.theme === 'light'
+                    ? 'bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100'
+                    : 'bg-rose-600/15 text-rose-300 border-rose-500/40 hover:bg-rose-600/25'
+                }`}
+              >
+                <Flame className="w-4 h-4" />
+                <span>Simulate Fire Hazard Call</span>
+              </button>
             </div>
           </div>
-          <div className="mt-2 text-xl font-black tracking-tight">
-            {hasCriticalAnomaly ? (
-              <span className="text-rose-400 font-mono">CIRCUIT ANOMALY</span>
-            ) : (
-              <span className="text-[#36B879] theme-light:text-[#347A53]">OPTIMAL / SAFE</span>
-            )}
-          </div>
-          <div className="mt-1 text-[11px] text-[#A6B3C1] theme-light:text-[#69776C]">
-            Lug Peak: <strong className="font-mono text-white theme-light:text-[#26382D]">{peakTemperature.toFixed(1)}°C</strong>
-          </div>
-        </div>
 
-      </div>
-
-      {/* Semicircular Telemetry Gauges Banner (Reference Image 3 Inspiration) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <ElectricalGauge
-          value={mainsVoltage}
-          min={160}
-          max={280}
-          unit="V"
-          label="Mains Line 1 Voltage (L1)"
-          warnThreshold={185}
-          critThreshold={250}
-        />
-        <ElectricalGauge
-          value={totalPowerWatts}
-          min={0}
-          max={6000}
-          unit="W"
-          label="Household Power Demand (Total Watts)"
-          warnThreshold={3800}
-          critThreshold={5000}
-        />
-      </div>
-
-      {/* Consumer Quick Context Banner */}
-      <div className="p-4 md:p-5 rounded-2xl border bg-[#202D3D] border-[#354456] theme-light:bg-white theme-light:border-[#DCE5D9] flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-11 h-11 rounded-xl bg-[#347A53] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-xs">
-            {userProfile.name.charAt(0)}
-          </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h2 className="text-base font-bold text-[#E8EEF5] theme-light:text-[#26382D]">{userProfile.name}</h2>
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D4E4D0] text-[#347A53] border border-[#77A985]">
-                Kothrud LT-1 Resident
-              </span>
+          {/* Quick Circuit Status Snapshot on Overview */}
+          <div className={`p-5 rounded-2xl border transition-all ${
+            settings.theme === 'light' ? 'bg-white border-[#DCE5D9]' : 'bg-[#202D3D] border-[#354456]'
+          }`}>
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className={`text-sm font-bold ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>
+                  Circuit Health Snapshot
+                </h3>
+                <p className={`text-xs ${settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}`}>
+                  Real-time breaker status, load current, and terminal lug temperatures.
+                </p>
+              </div>
+              <button
+                onClick={() => setUserActiveTab('switchboard')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                  settings.theme === 'light'
+                    ? 'bg-[#E8EFDF] text-[#347A53] hover:bg-[#D4E4D0]'
+                    : 'bg-[#273648] text-[#36B879] hover:bg-[#354456]'
+                }`}
+              >
+                Open Switchboard →
+              </button>
             </div>
-            <p className="text-xs text-[#A6B3C1] theme-light:text-[#69776C] mt-0.5">
-              Consumer ID: <strong className="font-mono text-white theme-light:text-[#26382D]">{userProfile.consumerNumber}</strong> • {userProfile.blockArea} • Rate: <strong className="font-mono text-white theme-light:text-[#26382D]">₹{userProfile.ratePerKwh}/kWh</strong>
-            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {outletList.map((outlet) => {
+                const isTripped = outlet.breaker_state === 'TRIPPED';
+                return (
+                  <div
+                    key={outlet.id}
+                    className={`p-3.5 rounded-xl border transition-all ${
+                      isTripped
+                        ? settings.theme === 'light'
+                          ? 'bg-rose-50 border-rose-300'
+                          : 'bg-rose-950/20 border-rose-500/50'
+                        : settings.theme === 'light'
+                        ? 'bg-[#F5F7F0] border-[#DCE5D9]'
+                        : 'bg-[#192330] border-[#354456]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-xs font-bold truncate ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>
+                        {outlet.name}
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        isTripped
+                          ? 'bg-rose-500/20 text-rose-500 border border-rose-500/30'
+                          : settings.theme === 'light'
+                          ? 'bg-[#D4E4D0] text-[#347A53] border border-[#77A985]'
+                          : 'bg-[#36B879]/20 text-[#36B879] border border-[#36B879]/40'
+                      }`}>
+                        {isTripped ? 'TRIPPED' : 'NORMAL'}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-xs font-mono">
+                      <span className={settings.theme === 'light' ? 'text-[#69776C]' : 'text-[#A6B3C1]'}>
+                        {outlet.voltage}V • {outlet.current}A
+                      </span>
+                      <span className={`font-bold ${settings.theme === 'light' ? 'text-[#26382D]' : 'text-white'}`}>
+                        {outlet.power_watts}W
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            onClick={() => triggerFireEmergencyProtocol('Master Bedroom AC', 'Simulated 180V Brownout Overheating (68°C) in Kothrud')}
-            className="px-3.5 py-2 rounded-xl bg-rose-600/15 hover:bg-rose-600/25 border border-rose-500/40 text-xs font-bold text-rose-400 flex items-center space-x-1.5 transition"
-          >
-            <Flame className="w-4 h-4" />
-            <span>Simulate Fire Hazard Call</span>
-          </button>
         </div>
-      </div>
-
-      {/* In-Page Quick Navigation Tabs */}
-      <div className="flex items-center gap-1.5 p-1.5 rounded-2xl border bg-[#182431] border-[#354456] theme-light:bg-[#E8EFDF] theme-light:border-[#DCE5D9] overflow-x-auto text-xs font-bold">
-        {[
-          { id: 'switchboard', label: 'Circuit Switchboard', icon: Zap },
-          { id: 'telemetry', label: 'Telemetry Graphs', icon: Activity },
-          { id: 'billing', label: 'Utility Billing & Census', icon: DollarSign },
-          { id: 'electrician', label: 'Book Electrician', icon: UserCheck },
-          { id: 'chat', label: 'Safety Help Desk & OTP', icon: MessageSquare },
-          { id: 'call_dept', label: 'Emergency Hotlines', icon: PhoneCall },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = userActiveTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setUserActiveTab(tab.id as any)}
-              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl transition whitespace-nowrap ${
-                isActive
-                  ? 'bg-[#347A53] text-white shadow-sm'
-                  : 'text-[#A6B3C1] hover:text-white theme-light:text-[#69776C] theme-light:hover:text-[#26382D]'
-              }`}
-            >
-              <Icon className="w-3.5 h-3.5" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      )}
 
       {/* =========================================================================
           TAB CONTENT: Digital Twin Switchboard

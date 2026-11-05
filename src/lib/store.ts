@@ -453,8 +453,8 @@ interface VoltGuardState {
   logout: () => void;
 
   // Active User Navigation & Tabs
-  userActiveTab: 'switchboard' | 'telemetry' | 'billing' | 'electrician' | 'report_bug' | 'chat' | 'call_dept' | 'settings';
-  setUserActiveTab: (tab: 'switchboard' | 'telemetry' | 'billing' | 'electrician' | 'report_bug' | 'chat' | 'call_dept' | 'settings') => void;
+  userActiveTab: 'overview' | 'switchboard' | 'telemetry' | 'billing' | 'electrician' | 'report_bug' | 'chat' | 'call_dept' | 'settings';
+  setUserActiveTab: (tab: 'overview' | 'switchboard' | 'telemetry' | 'billing' | 'electrician' | 'report_bug' | 'chat' | 'call_dept' | 'settings') => void;
 
   // Admin Navigation & Tabs
   adminActiveTab: 'overview' | 'users' | 'incidents' | 'electricians' | 'tickets' | 'chat' | 'model_testing' | 'settings';
@@ -557,7 +557,7 @@ export const useVoltStore = create<VoltGuardState>()(
         title: 'Safety Command & Grid Operations Head',
       },
 
-      userActiveTab: 'switchboard',
+      userActiveTab: 'overview',
       setUserActiveTab: (tab) => set({ userActiveTab: tab }),
 
       adminActiveTab: 'overview',
