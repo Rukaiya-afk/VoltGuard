@@ -91,3 +91,10 @@ VoltGuard is completely **Vercel-ready** out of the box with zero configuration:
   ```
   VoltGuard will automatically proxy API requests to your remote Python backend.
 
+---
+
+## 👩‍💻 Author & Project Lead
+- **Sole Creator & Lead Engineer**: [Rukaiya-afk](https://github.com/Rukaiya-afk) (`rukaiyasabunwala@gmail.com`)
+- **Repository**: [https://github.com/Rukaiya-afk/VoltGuard](https://github.com/Rukaiya-afk/VoltGuard)
+
+
