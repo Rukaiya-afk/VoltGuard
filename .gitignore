@@ -49,3 +49,5 @@ dist/
 eggs/
 .eggs/
 .pytest_cache/
+
+.vercel
